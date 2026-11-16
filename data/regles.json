@@ -1,0 +1,672 @@
+{
+  "meta": {
+    "version": 1,
+    "source": "Manuel des joueurs 2024 (édition française)",
+    "langue": "fr",
+    "pages": "Chaque champ « page » est le numéro imprimé dans le manuel. Dans le PDF, la page correspondante est page + 1.",
+    "redaction": "Les textes sont des résumés reformulés, pas des citations. En cas de doute, la page du manuel fait foi.",
+    "contenu": {
+      "classes": ["moine"],
+      "sousClasses": ["moine/paume"],
+      "especes": ["nain"],
+      "historiques": ["fermier"],
+      "dons": ["robuste", "amelioration-de-caracteristique"]
+    },
+    "aVerifier": [
+      {
+        "id": "defense-sans-armure-bouclier",
+        "page": 127,
+        "sujet": "Défense sans armure",
+        "probleme": "Le texte français dit seulement « tant que vous ne portez pas d'armure » et ne mentionne pas le bouclier, alors qu'Arts martiaux et Déplacement sans armure excluent armure ET bouclier. Encodé tel qu'imprimé (armure seule)."
+      },
+      {
+        "id": "nom-niveau-9",
+        "page": 129,
+        "sujet": "Aptitude de niveau 9",
+        "probleme": "La table p. 128 l'appelle « Mouvement acrobatique », le titre p. 129 « Déplacement acrobatique ». Le titre de la description est retenu."
+      },
+      {
+        "id": "nain-connaissance-pierre",
+        "page": 194,
+        "sujet": "Connaissance de la pierre",
+        "probleme": "Un mot manque dans l'OCR (« nécessite que vous […] sur une surface en pierre »). Lu comme « soyez »."
+      },
+      {
+        "id": "pv-temporaires-debut",
+        "page": 29,
+        "sujet": "Points de vie temporaires",
+        "probleme": "Le premier paragraphe (les pv temporaires sont perdus avant les pv réels) est tronqué dans l'OCR ; encodé d'après le glossaire p. 372 et la suite lisible p. 29."
+      },
+      {
+        "id": "dons-non-extraits",
+        "page": 199,
+        "sujet": "Dons généraux et Faveurs épiques",
+        "probleme": "Seuls Robuste et Amélioration de caractéristique sont extraits. Les autres dons (niveaux 4, 8, 12, 16) et les Faveurs épiques (niveau 19) restent à extraire ou à saisir en texte libre."
+      },
+      {
+        "id": "armes-non-extraites",
+        "page": 213,
+        "sujet": "Armes et équipement (chapitre 6)",
+        "probleme": "Les tables d'armes (lance, dague, serpe…) ne sont pas encore extraites ; prévu avec l'écran INVENTAIRE."
+      }
+    ]
+  },
+
+  "caracteristiques": {
+    "page": 10,
+    "liste": [
+      { "id": "for", "nom": "Force", "abrev": "For" },
+      { "id": "dex", "nom": "Dextérité", "abrev": "Dex" },
+      { "id": "con", "nom": "Constitution", "abrev": "Con" },
+      { "id": "int", "nom": "Intelligence", "abrev": "Int" },
+      { "id": "sag", "nom": "Sagesse", "abrev": "Sag" },
+      { "id": "cha", "nom": "Charisme", "abrev": "Cha" }
+    ],
+    "valeurMin": 1,
+    "valeurMaxAventurier": 20,
+    "modificateur": {
+      "page": 10,
+      "formule": "plancher((valeur - 10) / 2)",
+      "table": [
+        { "de": 1, "a": 1, "mod": -5 },
+        { "de": 2, "a": 3, "mod": -4 },
+        { "de": 4, "a": 5, "mod": -3 },
+        { "de": 6, "a": 7, "mod": -2 },
+        { "de": 8, "a": 9, "mod": -1 },
+        { "de": 10, "a": 11, "mod": 0 },
+        { "de": 12, "a": 13, "mod": 1 },
+        { "de": 14, "a": 15, "mod": 2 },
+        { "de": 16, "a": 17, "mod": 3 },
+        { "de": 18, "a": 19, "mod": 4 },
+        { "de": 20, "a": 21, "mod": 5 },
+        { "de": 22, "a": 23, "mod": 6 },
+        { "de": 24, "a": 25, "mod": 7 },
+        { "de": 26, "a": 27, "mod": 8 },
+        { "de": 28, "a": 29, "mod": 9 },
+        { "de": 30, "a": 30, "mod": 10 }
+      ]
+    }
+  },
+
+  "bonusMaitrise": {
+    "page": 128,
+    "parNiveau": [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6]
+  },
+
+  "competences": {
+    "page": 14,
+    "liste": [
+      { "id": "acrobaties", "nom": "Acrobaties", "carac": "dex" },
+      { "id": "arcanes", "nom": "Arcanes", "carac": "int" },
+      { "id": "athletisme", "nom": "Athlétisme", "carac": "for" },
+      { "id": "discretion", "nom": "Discrétion", "carac": "dex" },
+      { "id": "dressage", "nom": "Dressage", "carac": "sag" },
+      { "id": "escamotage", "nom": "Escamotage", "carac": "dex" },
+      { "id": "histoire", "nom": "Histoire", "carac": "int" },
+      { "id": "intimidation", "nom": "Intimidation", "carac": "cha" },
+      { "id": "intuition", "nom": "Intuition", "carac": "sag" },
+      { "id": "investigation", "nom": "Investigation", "carac": "int" },
+      { "id": "medecine", "nom": "Médecine", "carac": "sag" },
+      { "id": "nature", "nom": "Nature", "carac": "int" },
+      { "id": "perception", "nom": "Perception", "carac": "sag" },
+      { "id": "persuasion", "nom": "Persuasion", "carac": "cha" },
+      { "id": "religion", "nom": "Religion", "carac": "int" },
+      { "id": "representation", "nom": "Représentation", "carac": "cha" },
+      { "id": "survie", "nom": "Survie", "carac": "sag" },
+      { "id": "tromperie", "nom": "Tromperie", "carac": "cha" }
+    ],
+    "perceptionPassive": { "page": 40, "formule": "10 + modificateur aux tests de Sagesse (Perception)" }
+  },
+
+  "valeursDerivees": {
+    "caBase": { "page": 364, "formule": "10 + mod Dex", "note": "Si plusieurs formules de CA de base sont disponibles, on en choisit une seule." },
+    "initiative": { "page": 41, "formule": "mod Dex" },
+    "jetDeSauvegarde": { "page": 40, "formule": "mod de la caractéristique + bonus de maîtrise si maîtrisé" },
+    "competence": { "page": 40, "formule": "mod de la caractéristique + bonus de maîtrise si maîtrisée" },
+    "attaqueCorpsACorps": { "page": 41, "formule": "mod For + bonus de maîtrise" },
+    "attaqueDistance": { "page": 41, "formule": "mod Dex + bonus de maîtrise" },
+    "arrondi": { "page": 361, "regle": "On arrondit à l'entier inférieur, sauf mention contraire." }
+  },
+
+  "progression": {
+    "page": 42,
+    "niveauMax": 20,
+    "etapes": [
+      "Ajouter 1 dé de vie et augmenter le maximum de pv (dé + mod Con, minimum 1, ou valeur fixe de la classe).",
+      "Noter les nouvelles aptitudes de classe et faire les choix demandés.",
+      "Ajuster le bonus de maîtrise et tout ce qui en dépend.",
+      "Si le mod Con augmente de 1, le maximum de pv augmente de 1 par niveau déjà acquis."
+    ]
+  },
+
+  "classes": {
+    "moine": {
+      "nom": "Moine",
+      "page": 127,
+      "caracPrincipales": ["dex", "sag"],
+      "deDeVie": 8,
+      "pv": {
+        "niveau1": { "page": 40, "formule": "8 + mod Con" },
+        "parNiveauFixe": { "page": 42, "formule": "5 + mod Con" },
+        "parNiveauDe": { "page": 42, "formule": "1d8 + mod Con (minimum 1)" }
+      },
+      "maitrises": {
+        "page": 127,
+        "sauvegardes": ["for", "dex"],
+        "competences": { "nombre": 2, "parmi": ["acrobaties", "athletisme", "discretion", "histoire", "intuition", "religion"] },
+        "armes": "Armes courantes ; armes de guerre dotées de la propriété Légère",
+        "outils": "Un type d'outils d'artisan ou un instrument de musique au choix",
+        "armures": "Aucune"
+      },
+      "equipementDepart": {
+        "page": 127,
+        "choix": [
+          { "id": "A", "objets": ["Lance", "5 dagues", "Outils d'artisan ou instrument de musique choisi pour la maîtrise", "Paquetage d'explorateur"], "po": 11 },
+          { "id": "B", "objets": [], "po": 50 }
+        ]
+      },
+      "table": {
+        "page": 128,
+        "artsMartiaux": [6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 10, 10, 10, 10, 10, 10, 12, 12, 12, 12],
+        "pointsDeCredo": [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+        "bonusVitesseM": [0, 3, 3, 3, 3, 4.5, 4.5, 4.5, 4.5, 6, 6, 6, 6, 7.5, 7.5, 7.5, 7.5, 9, 9, 9]
+      },
+      "armesDeMoine": { "page": 127, "regle": "Armes courantes de corps à corps et armes de guerre dotées de la propriété Légère." },
+      "ddCredo": { "page": 128, "formule": "8 + mod Sag + bonus de maîtrise" },
+      "niveauSousClasse": 3,
+      "niveauxSousClasse": [3, 6, 11, 17],
+      "niveauxDon": [4, 8, 12, 16],
+      "aptitudes": [
+        {
+          "id": "arts-martiaux", "niveau": 1, "nom": "Arts martiaux", "page": 127,
+          "resume": "Mains nues et armes de Moine, sans armure ni bouclier.",
+          "detail": [
+            "Condition : combattre à mains nues ou avec une arme de Moine, sans armure ni bouclier.",
+            "Attaque à mains nues supplémentaire : une attaque à mains nues par une action Bonus.",
+            "Dé d'Arts martiaux : remplace les dégâts normaux de l'attaque à mains nues et des armes de Moine (1d6, puis selon la table).",
+            "Attaques lestes : mod Dex au lieu de For pour l'attaque et les dégâts. Pour Bousculade ou Lutte, mod Dex au lieu de For pour le DD."
+          ]
+        },
+        {
+          "id": "defense-sans-armure", "niveau": 1, "nom": "Défense sans armure", "page": 127,
+          "resume": "CA = 10 + Dex + Sag sans armure.",
+          "detail": ["Sans armure, la CA de base vaut 10 + mod Dex + mod Sag."],
+          "ca": { "base": 10, "mods": ["dex", "sag"], "condition": "sans-armure" },
+          "aVerifier": "defense-sans-armure-bouclier"
+        },
+        {
+          "id": "credo", "niveau": 2, "nom": "Credo du moine", "page": 127,
+          "resume": "Points de Credo, récupérés au Repos court ou long.",
+          "detail": [
+            "Le nombre de points de Credo suit la table du Moine.",
+            "Tous les points dépensés reviennent à la fin d'un Repos court ou long.",
+            "DD des aptitudes de Credo : 8 + mod Sag + bonus de maîtrise.",
+            "Trois usages de départ : Déluge de coups, Patience défensive, Porté par le vent (p. 128)."
+          ],
+          "ressource": { "id": "credo", "max": "table.pointsDeCredo", "recharge": ["repos-court", "repos-long"] }
+        },
+        {
+          "id": "deplacement-sans-armure", "niveau": 2, "nom": "Déplacement sans armure", "page": 128,
+          "resume": "Vitesse augmentée sans armure ni bouclier.",
+          "detail": ["Sans armure ni bouclier, la Vitesse augmente du bonus indiqué dans la table (+3 m au niveau 2, jusqu'à +9 m)."]
+        },
+        {
+          "id": "metabolisme-surnaturel", "niveau": 2, "nom": "Métabolisme surnaturel", "page": 128,
+          "resume": "À l'Initiative : récupère tout le Credo et des pv.",
+          "detail": [
+            "Quand vous jouez l'Initiative, vous pouvez récupérer tous vos points de Credo dépensés.",
+            "Vous lancez alors votre dé d'Arts martiaux et récupérez niveau de Moine + résultat du dé en pv.",
+            "Une utilisation, rechargée par un Repos long."
+          ],
+          "ressource": { "id": "metabolisme-surnaturel", "max": 1, "recharge": ["repos-long"] }
+        },
+        {
+          "id": "deviation-d-assaut", "niveau": 3, "nom": "Déviation d'assaut", "page": 128,
+          "resume": "Réaction : réduit les dégâts d'une attaque qui touche.",
+          "detail": [
+            "Déclencheur : un jet d'attaque vous touche et inflige des dégâts contondants, perforants ou tranchants.",
+            "Réaction : réduisez les dégâts totaux de 1d10 + mod Dex + niveau de Moine.",
+            "Si les dégâts tombent à 0, vous pouvez dépenser 1 point de Credo pour rediriger : une créature visible à 1,50 m (attaque de corps à corps) ou à 18 m sans Abri total (attaque à distance).",
+            "La cible fait un JS de Dextérité ; en cas d'échec, elle subit deux dés d'Arts martiaux + mod Dex, du même type que l'attaque (p. 129)."
+          ]
+        },
+        {
+          "id": "sous-classe", "niveau": 3, "nom": "Sous-classe de Moine", "page": 129,
+          "resume": "Choix de la sous-classe.",
+          "detail": ["Vous choisissez une sous-classe et recevez ses aptitudes aux niveaux 3, 6, 11 et 17."],
+          "choix": { "type": "sous-classe" }
+        },
+        {
+          "id": "don-4", "niveau": 4, "nom": "Amélioration de caractéristique", "page": 129,
+          "resume": "Don Amélioration de caractéristique ou autre don.",
+          "detail": ["Vous recevez le don Amélioration de caractéristique ou un autre don dont vous remplissez les conditions. De nouveau aux niveaux 8, 12 et 16."],
+          "choix": { "type": "don" }, "repeteAuxNiveaux": [8, 12, 16]
+        },
+        {
+          "id": "chute-ralentie", "niveau": 4, "nom": "Chute ralentie", "page": 129,
+          "resume": "Réaction : réduit les dégâts de chute de 5 × niveau.",
+          "detail": ["Réaction : réduisez les dégâts de chute subis de cinq fois votre niveau de Moine."]
+        },
+        {
+          "id": "attaque-supplementaire", "niveau": 5, "nom": "Attaque supplémentaire", "page": 129,
+          "resume": "Deux attaques avec l'action Attaque.",
+          "detail": ["Quand vous entreprenez l'action Attaque à votre tour, vous attaquez deux fois au lieu d'une."]
+        },
+        {
+          "id": "frappe-etourdissante", "niveau": 5, "nom": "Frappe étourdissante", "page": 129,
+          "resume": "1 Credo sur une touche : JS Con ou Étourdi.",
+          "detail": [
+            "Une fois par tour, quand vous touchez avec une arme de Moine ou à mains nues, vous pouvez dépenser 1 point de Credo.",
+            "La cible fait un JS de Constitution. Échec : état Étourdi jusqu'au début de votre tour suivant.",
+            "Réussite : sa Vitesse est réduite de moitié jusqu'au début de votre tour suivant, et le prochain jet d'attaque contre elle dans cet intervalle a l'Avantage."
+          ]
+        },
+        {
+          "id": "frappes-renforcees", "niveau": 6, "nom": "Frappes renforcées", "page": 129,
+          "resume": "Dégâts à mains nues : force ou type normal, au choix.",
+          "detail": ["Chaque fois que vous infligez des dégâts à mains nues, ils sont au choix des dégâts de force ou du type normal de l'attaque."]
+        },
+        {
+          "id": "esquive-totale", "niveau": 7, "nom": "Esquive totale", "page": 129,
+          "resume": "JS Dex pour demi-dégâts : rien si réussi, moitié si raté.",
+          "detail": [
+            "Face à un effet qui permet un JS de Dextérité pour moitié de dégâts : aucun dégât si le JS est réussi, la moitié s'il est raté.",
+            "Sans effet si vous subissez l'état Neutralisé."
+          ]
+        },
+        {
+          "id": "deplacement-acrobatique", "niveau": 9, "nom": "Déplacement acrobatique", "page": 129,
+          "resume": "Se déplacer sur les murs et les liquides à son tour.",
+          "detail": ["Sans armure ni bouclier, vous pouvez à votre tour vous déplacer le long de surfaces verticales et sur les liquides sans tomber."],
+          "aVerifier": "nom-niveau-9"
+        },
+        {
+          "id": "autosubsistance", "niveau": 10, "nom": "Autosubsistance", "page": 129,
+          "resume": "Fin de tour : retire Charmé, Effrayé ou Empoisonné.",
+          "detail": [
+            "À la fin de chacun de vos tours, vous pouvez mettre fin sur vous à l'un de ces états : Charmé, Effrayé ou Empoisonné.",
+            "Se passer de nourriture et d'eau ne vous donne pas de niveaux d'Épuisement."
+          ]
+        },
+        {
+          "id": "credo-accru", "niveau": 10, "nom": "Credo accru", "page": 129,
+          "resume": "Améliore Déluge de coups, Patience défensive et Porté par le vent.",
+          "detail": [
+            "Déluge de coups : trois attaques à mains nues au lieu de deux pour 1 point de Credo.",
+            "Patience défensive (version à 1 Credo) : vous recevez des pv temporaires égaux à deux jets de votre dé d'Arts martiaux.",
+            "Porté par le vent (version à 1 Credo) : vous pouvez emmener une créature consentante de taille G ou inférieure située à 1,50 m ; elle se déplace avec vous jusqu'à la fin du tour sans provoquer d'attaques d'Opportunité."
+          ]
+        },
+        {
+          "id": "parade-energetique", "niveau": 13, "nom": "Parade énergétique", "page": 129,
+          "resume": "Déviation d'assaut contre tous les types de dégâts.",
+          "detail": ["Déviation d'assaut s'applique aux attaques qui infligent n'importe quel type de dégâts."]
+        },
+        {
+          "id": "survivant-discipline", "niveau": 14, "nom": "Survivant discipliné", "page": 129,
+          "resume": "Maîtrise de tous les JS ; 1 Credo pour rejouer un JS raté.",
+          "detail": [
+            "Vous maîtrisez tous les jets de sauvegarde.",
+            "Quand vous ratez un JS, vous pouvez dépenser 1 point de Credo pour le rejouer ; vous gardez le nouveau jet."
+          ],
+          "maitriseToutesSauvegardes": true
+        },
+        {
+          "id": "credo-paracheve", "niveau": 15, "nom": "Credo parachevé", "page": 129,
+          "resume": "À l'Initiative : remonte à 4 points de Credo.",
+          "detail": ["Quand vous jouez l'Initiative sans utiliser Métabolisme surnaturel et qu'il vous reste moins de 4 points de Credo, vous en récupérez jusqu'à en avoir 4."]
+        },
+        {
+          "id": "defense-superieure", "niveau": 18, "nom": "Défense supérieure", "page": 129,
+          "resume": "3 Credo au début du tour : Résistance à tout sauf force, 1 minute.",
+          "detail": [
+            "Au début de votre tour, vous pouvez dépenser 3 points de Credo.",
+            "Pendant 1 minute, vous avez la Résistance à tous les dégâts sauf ceux de force.",
+            "L'effet prend fin si vous subissez l'état Neutralisé."
+          ]
+        },
+        {
+          "id": "faveur-epique", "niveau": 19, "nom": "Faveur épique", "page": 129,
+          "resume": "Un don de Faveur épique ou un autre don.",
+          "detail": ["Vous recevez un don de Faveur épique ou un autre don dont vous remplissez les conditions. Le manuel recommande Faveur d'attaque irrésistible."],
+          "choix": { "type": "don-faveur-epique" }, "aVerifier": "dons-non-extraits"
+        },
+        {
+          "id": "esprit-et-corps", "niveau": 20, "nom": "Esprit et corps", "page": 129,
+          "resume": "Dextérité et Sagesse +4 (maximum 25).",
+          "detail": ["Vos valeurs de Dextérité et de Sagesse augmentent de 4, jusqu'à un maximum de 25."],
+          "bonusCarac": { "dex": 4, "sag": 4, "max": 25 }
+        }
+      ],
+      "optionsCombat": [
+        {
+          "id": "attaque", "emplacement": "action", "niveau": 1, "nom": "Attaque", "credo": 0, "de": "arts-martiaux", "page": 127,
+          "resume": "Mains nues ou arme de Moine. Attaque et dégâts avec Dex.",
+          "evolutions": [{ "niveau": 5, "resume": "Deux attaques.", "page": 129 }]
+        },
+        {
+          "id": "attaque-bonus", "emplacement": "bonus", "niveau": 1, "nom": "Attaque à mains nues", "credo": 0, "de": "arts-martiaux", "page": 127,
+          "resume": "Une attaque à mains nues."
+        },
+        {
+          "id": "deluge-de-coups", "emplacement": "bonus", "niveau": 2, "nom": "Déluge de coups", "credo": 1, "de": "arts-martiaux", "page": 128,
+          "resume": "Deux attaques à mains nues.",
+          "evolutions": [{ "niveau": 10, "resume": "Trois attaques à mains nues.", "page": 129 }]
+        },
+        {
+          "id": "patience-defensive-libre", "emplacement": "bonus", "niveau": 2, "nom": "Patience défensive", "credo": 0, "page": 128,
+          "resume": "Désengagement."
+        },
+        {
+          "id": "patience-defensive", "emplacement": "bonus", "niveau": 2, "nom": "Patience défensive", "credo": 1, "page": 128,
+          "resume": "Désengagement + Esquive.",
+          "evolutions": [{ "niveau": 10, "resume": "Désengagement + Esquive, et pv temporaires = deux dés d'Arts martiaux.", "page": 129 }]
+        },
+        {
+          "id": "porte-par-le-vent-libre", "emplacement": "bonus", "niveau": 2, "nom": "Porté par le vent", "credo": 0, "page": 128,
+          "resume": "Pointe."
+        },
+        {
+          "id": "porte-par-le-vent", "emplacement": "bonus", "niveau": 2, "nom": "Porté par le vent", "credo": 1, "page": 128,
+          "resume": "Désengagement + Pointe, distance de saut doublée ce tour.",
+          "evolutions": [{ "niveau": 10, "resume": "Idem, et vous pouvez emmener une créature consentante (taille G max) à 1,50 m.", "page": 129 }]
+        },
+        {
+          "id": "deviation-d-assaut", "emplacement": "reaction", "niveau": 3, "nom": "Déviation d'assaut", "credo": 0, "de": "1d10", "page": 128,
+          "resume": "Réduit les dégâts de 1d10 + Dex + niveau.",
+          "sousChoix": [
+            { "id": "rediriger", "nom": "Rediriger", "credo": 1, "de": "2 × arts-martiaux", "resume": "Si dégâts réduits à 0 : JS Dex ou 2 dés d'Arts martiaux + Dex.", "page": 128 }
+          ],
+          "evolutions": [{ "niveau": 13, "resume": "Contre tous les types de dégâts.", "page": 129 }]
+        },
+        {
+          "id": "chute-ralentie", "emplacement": "reaction", "niveau": 4, "nom": "Chute ralentie", "credo": 0, "page": 129,
+          "resume": "Dégâts de chute réduits de 5 × niveau."
+        },
+        {
+          "id": "frappe-etourdissante", "emplacement": "touche", "niveau": 5, "nom": "Frappe étourdissante", "credo": 1, "page": 129,
+          "resume": "Une fois par tour. JS Con ou Étourdi.", "limite": "1-par-tour"
+        },
+        {
+          "id": "autosubsistance", "emplacement": "fin-de-tour", "niveau": 10, "nom": "Autosubsistance", "credo": 0, "page": 129,
+          "resume": "Retire Charmé, Effrayé ou Empoisonné."
+        },
+        {
+          "id": "survivant-discipline", "emplacement": "declencheur", "niveau": 14, "nom": "Rejouer un JS raté", "credo": 1, "page": 129,
+          "resume": "Rejoue le JS, garde le nouveau jet."
+        },
+        {
+          "id": "defense-superieure", "emplacement": "debut-de-tour", "niveau": 18, "nom": "Défense supérieure", "credo": 3, "page": 129,
+          "resume": "Résistance à tout sauf force, 1 minute."
+        },
+        {
+          "id": "metabolisme-surnaturel", "emplacement": "initiative", "niveau": 2, "nom": "Métabolisme surnaturel", "credo": 0, "de": "arts-martiaux", "page": 128,
+          "resume": "Tout le Credo revient ; pv = niveau + dé d'Arts martiaux.", "ressource": "metabolisme-surnaturel"
+        },
+        {
+          "id": "credo-paracheve", "emplacement": "initiative", "niveau": 15, "nom": "Credo parachevé", "credo": 0, "page": 129,
+          "resume": "Sans Métabolisme surnaturel : remonte à 4 Credo."
+        }
+      ],
+      "sousClasses": {
+        "paume": {
+          "nom": "Credo de la Paume",
+          "page": 133,
+          "aptitudes": [
+            {
+              "id": "technique-de-la-paume", "niveau": 3, "nom": "Technique de la Paume", "page": 133,
+              "resume": "Un effet par attaque de Déluge de coups qui touche.",
+              "detail": [
+                "Chaque fois que vous touchez avec une attaque de Déluge de coups, vous pouvez imposer un effet à la cible.",
+                "Bourrade : JS de Force ou repoussée jusqu'à 4,50 m.",
+                "Hésitation : la cible ne peut pas faire d'attaque d'Opportunité jusqu'au début de son tour suivant.",
+                "Renversement : JS de Dextérité ou état À terre."
+              ]
+            },
+            {
+              "id": "plenitude-physique", "niveau": 6, "nom": "Plénitude physique", "page": 133,
+              "resume": "Action Bonus : soin d'un dé d'Arts martiaux + Sag.",
+              "detail": [
+                "Action Bonus : lancez votre dé d'Arts martiaux et récupérez le résultat + mod Sag en pv (minimum 1).",
+                "Utilisations : mod Sag (minimum 1), rechargées par un Repos long."
+              ],
+              "ressource": { "id": "plenitude-physique", "max": "max(1, mod Sag)", "recharge": ["repos-long"] }
+            },
+            {
+              "id": "foulee-preste", "niveau": 11, "nom": "Foulée preste", "page": 133,
+              "resume": "Porté par le vent après une autre action Bonus.",
+              "detail": ["Quand vous entreprenez une action Bonus autre que Porté par le vent, vous pouvez utiliser Porté par le vent aussitôt après."]
+            },
+            {
+              "id": "paume-vibratoire", "niveau": 17, "nom": "Paume vibratoire", "page": 133,
+              "resume": "4 Credo sur une touche à mains nues ; 10d12 de force à la demande.",
+              "detail": [
+                "Quand vous touchez à mains nues, vous pouvez dépenser 4 points de Credo pour créer des vibrations qui durent autant de jours que votre niveau de Moine.",
+                "Elles sont inoffensives jusqu'à ce que vous y mettiez fin, par une action ou en renonçant à l'une des attaques de votre action Attaque. Vous et la cible devez être sur le même plan.",
+                "La cible fait alors un JS de Constitution : 10d12 dégâts de force si échec, la moitié si réussite (p. 134).",
+                "Une seule créature à la fois. Vous pouvez aussi y mettre fin sans effet, sans action."
+              ]
+            }
+          ],
+          "optionsCombat": [
+            {
+              "id": "technique-de-la-paume", "emplacement": "touche", "niveau": 3, "nom": "Technique de la Paume", "credo": 0, "page": 133,
+              "resume": "Sur chaque attaque de Déluge de coups qui touche.", "necessite": "deluge-de-coups",
+              "sousChoix": [
+                { "id": "bourrade", "nom": "Bourrade", "resume": "JS For ou repoussée de 4,50 m max.", "page": 133 },
+                { "id": "hesitation", "nom": "Hésitation", "resume": "Pas d'attaque d'Opportunité jusqu'à son prochain tour.", "page": 133 },
+                { "id": "renversement", "nom": "Renversement", "resume": "JS Dex ou À terre.", "page": 133 }
+              ]
+            },
+            {
+              "id": "plenitude-physique", "emplacement": "bonus", "niveau": 6, "nom": "Plénitude physique", "credo": 0, "de": "arts-martiaux", "page": 133,
+              "resume": "Soin : dé d'Arts martiaux + Sag.", "ressource": "plenitude-physique"
+            },
+            {
+              "id": "foulee-preste", "emplacement": "declencheur", "niveau": 11, "nom": "Foulée preste", "credo": 0, "page": 133,
+              "resume": "Après une autre action Bonus : Porté par le vent en plus."
+            },
+            {
+              "id": "paume-vibratoire", "emplacement": "touche", "niveau": 17, "nom": "Paume vibratoire", "credo": 4, "de": "10d12", "page": 133,
+              "resume": "Pose les vibrations. Déclenchement : JS Con, 10d12 de force."
+            }
+          ]
+        }
+      }
+    }
+  },
+
+  "especes": {
+    "nain": {
+      "nom": "Nain",
+      "page": 194,
+      "type": "Humanoïde",
+      "taille": "M",
+      "vitesseM": 9,
+      "traits": [
+        {
+          "id": "connaissance-de-la-pierre", "nom": "Connaissance de la pierre", "page": 194,
+          "resume": "Action Bonus : Perception des vibrations 18 m, 10 minutes.",
+          "detail": [
+            "Action Bonus : vous recevez la Perception des vibrations à 18 m pendant 10 minutes.",
+            "Vous devez être sur une surface en pierre, naturelle ou façonnée, ou la toucher.",
+            "Utilisations : bonus de maîtrise, rechargées par un Repos long."
+          ],
+          "ressource": { "id": "connaissance-de-la-pierre", "max": "bonus de maîtrise", "recharge": ["repos-long"] },
+          "optionCombat": { "emplacement": "bonus", "credo": 0 },
+          "aVerifier": "nain-connaissance-pierre"
+        },
+        {
+          "id": "resistance-naine", "nom": "Résistance naine", "page": 194,
+          "resume": "Résistance au poison ; Avantage aux JS contre Empoisonné.",
+          "detail": ["Résistance aux dégâts de poison.", "Avantage aux jets de sauvegarde pour éviter l'état Empoisonné ou y mettre fin sur vous."]
+        },
+        {
+          "id": "tenacite-naine", "nom": "Ténacité naine", "page": 194,
+          "resume": "+1 pv maximum par niveau.",
+          "detail": ["Votre maximum de pv augmente de 1, puis de 1 à chaque niveau gagné."],
+          "pvMaxParNiveau": 1
+        },
+        {
+          "id": "vision-dans-le-noir", "nom": "Vision dans le noir", "page": 194,
+          "resume": "Vision dans le noir sur 36 m.",
+          "detail": ["Vision dans le noir sur 36 m (définition p. 376)."]
+        }
+      ]
+    }
+  },
+
+  "historiques": {
+    "fermier": {
+      "nom": "Fermier",
+      "page": 181,
+      "caracteristiques": ["for", "con", "sag"],
+      "don": "robuste",
+      "competences": ["dressage", "nature"],
+      "outils": "Outils de charpentier",
+      "equipement": {
+        "choix": [
+          { "id": "A", "objets": ["Serpe", "Outils de charpentier", "Trousse de soins", "Pelle", "Pot en fer", "Tenue de voyage"], "po": 30 },
+          { "id": "B", "objets": [], "po": 50 }
+        ]
+      }
+    }
+  },
+
+  "dons": {
+    "robuste": {
+      "nom": "Robuste", "categorie": "origines", "page": 202,
+      "resume": "+2 pv maximum par niveau.",
+      "detail": ["Votre maximum de pv augmente du double de votre niveau quand vous recevez ce don, puis de 2 à chaque niveau gagné."],
+      "pvMaxParNiveau": 2
+    },
+    "amelioration-de-caracteristique": {
+      "nom": "Amélioration de caractéristique", "categorie": "general", "page": 202,
+      "prerequis": "Niveau 4 ou supérieur",
+      "resume": "+2 à une caractéristique, ou +1 à deux. Maximum 20.",
+      "detail": ["Augmentez une valeur de caractéristique de 2, ou deux valeurs de 1.", "Ce don ne peut pas porter une valeur au-delà de 20.", "Répétable."],
+      "repetable": true,
+      "choix": { "type": "caracteristiques", "options": [{ "une": 2 }, { "deux": 1 }], "max": 20 }
+    }
+  },
+
+  "combat": {
+    "tour": {
+      "page": 23,
+      "resume": "À votre tour : un déplacement (jusqu'à votre Vitesse) et une action, dans l'ordre de votre choix.",
+      "detail": [
+        "Une action Bonus seulement si une règle vous en donne une, et une seule par tour (p. 360).",
+        "Une Réaction par round ; elle revient au début de votre tour suivant (p. 373).",
+        "Le déplacement peut être scindé avant et après les actions (p. 25).",
+        "Une interaction gratuite avec un objet pendant le déplacement ou l'action ; une seconde demande l'action Utilisation (p. 24).",
+        "Se jeter À terre ne coûte ni action ni déplacement, si la Vitesse est supérieure à 0 (p. 25)."
+      ]
+    },
+    "actions": [
+      { "id": "attaque", "nom": "Attaque", "page": 361, "resume": "Un jet d'attaque avec une arme ou à mains nues.", "detail": ["Vous pouvez vous équiper ou vous déséquiper d'une arme à chaque attaque de cette action, avant ou après l'attaque."] },
+      { "id": "desengagement", "nom": "Désengagement", "page": 365, "resume": "Votre déplacement ne provoque pas d'attaque d'Opportunité ce tour.", "detail": [] },
+      { "id": "esquive", "nom": "Esquive", "page": 366, "resume": "Désavantage aux attaques contre vous, Avantage à vos JS de Dex.", "detail": ["Jusqu'au début de votre tour suivant, contre les assaillants que vous voyez.", "Perdu si vous êtes Neutralisé ou si votre Vitesse tombe à 0."] },
+      { "id": "pointe", "nom": "Pointe", "page": 371, "resume": "Déplacement supplémentaire égal à votre Vitesse.", "detail": ["Calculé après application des modificateurs de Vitesse."] },
+      { "id": "soutien", "nom": "Soutien", "page": 374, "resume": "Donne l'Avantage à un allié (test ou attaque).", "detail": ["Test : un allié proche a l'Avantage à son prochain test avec une compétence ou un outil que vous maîtrisez, avant le début de votre tour suivant.", "Attaque : contre un ennemi à 1,50 m de vous, le prochain jet d'attaque d'un allié a l'Avantage, avant le début de votre tour suivant.", "Sert aussi à stabiliser une créature à 0 pv : test de Sagesse (Médecine) DD 10 (p. 29)."] },
+      { "id": "furtivite", "nom": "Furtivité", "page": 367, "resume": "Test de Dextérité (Discrétion) DD 15 pour se cacher.", "detail": ["Conditions : visibilité nulle, ou Abri supérieur ou total, et hors du champ de vision des ennemis.", "Réussite : état Invisible tant que vous êtes caché. Le résultat est le DD pour vous trouver avec Sagesse (Perception).", "Prend fin si vous faites plus de bruit qu'un murmure, si un ennemi vous détecte, si vous attaquez ou lancez un sort à composante verbale."] },
+      { "id": "intention", "nom": "Intention", "page": 368, "resume": "Préparer une action déclenchée par votre Réaction.", "detail": ["Vous fixez un déclencheur perceptible et l'action (ou le déplacement) qui y répond.", "Quand il survient, vous pouvez jouer votre Réaction juste après, ou l'ignorer."] },
+      { "id": "utilisation", "nom": "Utilisation", "page": 376, "resume": "Utiliser un objet qui demande une action.", "detail": [] },
+      { "id": "etude", "nom": "Étude", "page": 366, "resume": "Test d'Intelligence pour se rappeler ou trouver une information.", "detail": [] },
+      { "id": "observation", "nom": "Observation", "page": 370, "resume": "Test de Sagesse pour discerner ce qui n'est pas évident.", "detail": ["Intuition, Médecine, Perception ou Survie selon ce que vous cherchez (p. 371)."] },
+      { "id": "influence", "nom": "Influence", "page": 368, "resume": "Inciter un monstre à faire quelque chose.", "detail": ["Test seulement si le monstre est hésitant ; DD 15 ou sa valeur d'Intelligence, le plus élevé."] },
+      { "id": "magie", "nom": "Magie", "page": 369, "resume": "Lancer un sort ou activer une aptitude ou un objet magique.", "detail": [] }
+    ],
+    "attaqueAMainsNues": {
+      "page": 362,
+      "resume": "Attaque de corps à corps à 1,50 m, avec un effet au choix.",
+      "options": [
+        { "id": "degats", "nom": "Dégâts", "page": 362,"resume": "Jet d'attaque (For + maîtrise). Touche : 1 + mod For dégâts contondants.", "note": "Moine : Dex possible et dé d'Arts martiaux à la place (p. 127)." },
+        { "id": "bousculade", "nom": "Bousculade", "page": 362,"resume": "JS For ou Dex (au choix de la cible) ou poussée de 1,50 m ou À terre.", "note": "DD 8 + mod For + maîtrise ; cible au plus d'une taille au-dessus. Moine : Dex possible pour le DD (p. 127)." },
+        { "id": "lutte", "nom": "Lutte", "page": 362,"resume": "JS For ou Dex (au choix de la cible) ou Agrippé.", "note": "DD 8 + mod For + maîtrise ; cible au plus d'une taille au-dessus ; une main libre. Moine : Dex possible pour le DD (p. 127)." }
+      ]
+    },
+    "attaqueOpportunite": {
+      "page": 362,
+      "resume": "Réaction : une attaque de corps à corps quand une créature quitte votre allonge.",
+      "detail": ["La créature doit être visible et quitter votre allonge par son action, son action Bonus, sa Réaction ou l'une de ses Vitesses.", "Attaque avec une arme de corps à corps ou à mains nues, juste avant qu'elle sorte de l'allonge.", "La téléportation n'en provoque jamais (p. 375)."]
+    },
+    "terrainDifficile": { "page": 375, "resume": "Chaque mètre parcouru coûte le double. Non cumulatif." },
+    "saut": {
+      "page": 374,
+      "longueur": "Valeur de Force × 30 cm avec 3 m d'élan ; la moitié sans élan.",
+      "hauteur": "90 cm + mod For × 30 cm avec 3 m d'élan ; la moitié sans élan."
+    },
+    "coupCritique": { "page": 364, "resume": "20 naturel au jet d'attaque : touche, et les dés de dégâts sont lancés deux fois." }
+  },
+
+  "pointsDeVie": {
+    "regle": { "page": 372, "resume": "Jamais au-dessus du maximum, jamais en dessous de 0." },
+    "temporaires": {
+      "page": 29,
+      "resume": "Réserve à part, perdue avant les pv réels.",
+      "detail": ["Ils durent jusqu'à épuisement ou jusqu'à la fin d'un Repos long.", "Ils ne se cumulent pas : on garde l'ancienne valeur ou on prend la nouvelle.", "Ce ne sont pas des soins et ils ne raniment pas à 0 pv."],
+      "aVerifier": "pv-temporaires-debut"
+    },
+    "enPeril": { "page": 365, "resume": "En péril : il vous reste la moitié de vos pv ou moins." },
+    "sauvegardesContreLaMort": {
+      "page": 29,
+      "resume": "À 0 pv, au début du tour : 1d20, 10 ou plus = réussite.",
+      "detail": ["Trois réussites : Stabilisé. Trois échecs : mort. Pas besoin qu'ils soient consécutifs.", "1 naturel : deux échecs. 20 naturel : vous récupérez 1 pv.", "Dégâts subis à 0 pv : un échec (deux si Coup critique). Dégâts au moins égaux au maximum de pv : mort.", "Les compteurs reviennent à zéro quand vous récupérez au moins 1 pv ou êtes Stabilisé."]
+    },
+    "zeroPv": {
+      "page": 28,
+      "resume": "À 0 pv : Inconscient jusqu'à regagner au moins 1 pv.",
+      "detail": ["Vous êtes soumis aux jets de sauvegarde contre la mort.", "Dégâts massifs : si l'excédent de dégâts après être tombé à 0 pv atteint votre maximum de pv, vous mourez sur le coup."]
+    }
+  },
+
+  "etats": [
+    { "id": "a-terre", "nom": "À terre", "page": 360, "resume": "Désavantage à vos attaques ; se relever coûte la moitié de la Vitesse.", "detail": ["Vous ne pouvez que ramper, ou vous relever en dépensant la moitié de votre Vitesse. Impossible si votre Vitesse est 0.", "Désavantage à vos jets d'attaque.", "Les attaques contre vous ont l'Avantage si l'assaillant est à 1,50 m, sinon le Désavantage."] },
+    { "id": "agrippe", "nom": "Agrippé", "page": 360, "resume": "Vitesse 0 ; Désavantage aux attaques sauf contre l'agrippeur.", "detail": ["Vitesse 0, sans augmentation possible.", "Désavantage aux jets d'attaque contre toute cible autre que l'agrippeur.", "L'agrippeur peut vous tirer ou vous porter (p. 361).", "S'évader : une action, test de Force (Athlétisme) ou Dextérité (Acrobaties) contre le DD d'évasion (p. 369)."] },
+    { "id": "assourdi", "nom": "Assourdi", "page": 361, "resume": "Vous n'entendez rien.", "detail": ["Échec automatique aux tests de caractéristique qui reposent sur l'ouïe."] },
+    { "id": "aveugle", "nom": "Aveuglé", "page": 362, "resume": "Désavantage à vos attaques, Avantage contre vous.", "detail": ["Échec automatique aux tests de caractéristique qui reposent sur la vue.", "Les attaques contre vous ont l'Avantage ; les vôtres le Désavantage."] },
+    { "id": "charme", "nom": "Charmé", "page": 363, "resume": "Vous ne pouvez pas attaquer le charmeur.", "detail": ["Vous ne pouvez ni attaquer le charmeur ni le cibler avec un effet qui inflige des dégâts.", "Le charmeur a l'Avantage aux tests d'interaction sociale avec vous."] },
+    { "id": "effraye", "nom": "Effrayé", "page": 365, "resume": "Désavantage tant que la source est en vue ; impossible d'approcher.", "detail": ["Désavantage aux tests de caractéristique et aux jets d'attaque tant que la source de l'effroi est dans votre champ de vision.", "Vous ne pouvez pas vous rapprocher volontairement de la source."] },
+    { "id": "empoisonne", "nom": "Empoisonné", "page": 365, "resume": "Désavantage aux attaques et aux tests de caractéristique.", "detail": [] },
+    { "id": "entrave", "nom": "Entravé", "page": 365, "resume": "Vitesse 0 ; Désavantage à vos attaques et JS Dex.", "detail": ["Vitesse 0, sans augmentation possible.", "Les attaques contre vous ont l'Avantage ; les vôtres le Désavantage.", "Désavantage aux jets de sauvegarde de Dextérité."] },
+    { "id": "epuisement", "nom": "Épuisement", "page": 365, "cumulable": true, "niveauMax": 6, "resume": "Par niveau : −2 aux Tests d20 et −1,50 m de Vitesse.", "detail": ["Cumulatif. Mort au niveau 6.", "Tests d20 : résultat réduit de 2 × niveau d'Épuisement (p. 366).", "Vitesse réduite de 1,50 m × niveau d'Épuisement (p. 366).", "Un Repos long retire 1 niveau."] },
+    { "id": "etourdi", "nom": "Étourdi", "page": 366, "resume": "Neutralisé ; échec auto aux JS For et Dex.", "detail": ["Vous subissez l'état Neutralisé.", "Échec automatique aux jets de sauvegarde de Force et de Dextérité.", "Les attaques contre vous ont l'Avantage."], "inclut": ["neutralise"] },
+    { "id": "inconscient", "nom": "Inconscient", "page": 368, "resume": "À terre et Neutralisé ; critiques automatiques à 1,50 m.", "detail": ["Vous subissez les états À terre et Neutralisé et lâchez ce que vous teniez. Vous restez À terre quand l'état prend fin.", "Vitesse 0.", "Les attaques contre vous ont l'Avantage.", "Échec automatique aux jets de sauvegarde de Force et de Dextérité.", "Toute attaque qui touche depuis 1,50 m ou moins est un Coup critique.", "Vous n'avez pas conscience de ce qui vous entoure."], "inclut": ["a-terre", "neutralise"] },
+    { "id": "invisible", "nom": "Invisible", "page": 369, "resume": "Avantage à vos attaques, Désavantage contre vous.", "detail": ["Avantage au jet d'Initiative.", "Les effets qui exigent de voir la cible ne vous affectent pas, sauf si leur créateur vous voit autrement.", "Les attaques contre vous ont le Désavantage ; les vôtres l'Avantage. Sans effet contre une créature qui vous voit."] },
+    { "id": "neutralise", "nom": "Neutralisé", "page": 370, "resume": "Ni action, ni action Bonus, ni Réaction.", "detail": ["Votre Concentration est brisée.", "Vous ne pouvez pas parler.", "Désavantage au jet d'Initiative si vous êtes Neutralisé à ce moment."] },
+    { "id": "paralyse", "nom": "Paralysé", "page": 371, "resume": "Neutralisé, Vitesse 0 ; critiques automatiques à 1,50 m.", "detail": ["Vous subissez l'état Neutralisé.", "Vitesse 0.", "Échec automatique aux jets de sauvegarde de Force et de Dextérité.", "Les attaques contre vous ont l'Avantage.", "Toute attaque qui touche depuis 1,50 m ou moins est un Coup critique."], "inclut": ["neutralise"] },
+    { "id": "petrifie", "nom": "Pétrifié", "page": 371, "resume": "Changé en pierre : Neutralisé, Résistance à tous les dégâts.", "detail": ["Vous et vos objets non magiques devenez une substance inanimée ; votre poids est décuplé.", "Vous subissez l'état Neutralisé. Vitesse 0.", "Les attaques contre vous ont l'Avantage.", "Échec automatique aux jets de sauvegarde de Force et de Dextérité.", "Résistance à tous les dégâts. Immunité contre l'état Empoisonné."], "inclut": ["neutralise"] }
+  ],
+
+  "repos": {
+    "court": {
+      "nom": "Repos court", "page": 373,
+      "duree": "Au moins 1 heure",
+      "condition": "Avoir au moins 1 pv pour commencer.",
+      "resume": "Dépenser des dés de vie pour récupérer des pv ; certaines aptitudes se rechargent.",
+      "benefices": [
+        "Dés de vie : pour chaque dé dépensé, lancez-le et ajoutez votre mod Con ; vous récupérez ce total en pv (minimum 1). Vous décidez après chaque dé d'en dépenser un autre.",
+        "Les aptitudes à recharge « Repos court » se rechargent."
+      ],
+      "interruption": ["Jouer l'Initiative", "Lancer un sort autre qu'un sort mineur", "Subir des dégâts"],
+      "siInterrompu": "Aucun bénéfice.",
+      "effets": { "recharge": "repos-court", "desDeVie": "depense-libre" }
+    },
+    "long": {
+      "nom": "Repos long", "page": 373,
+      "duree": "Au moins 8 heures, dont 6 de sommeil et au plus 2 de menues tâches",
+      "condition": "Avoir au moins 1 pv pour commencer. Au moins 16 heures entre deux Repos longs.",
+      "resume": "Tous les pv, tous les dés de vie, −1 Épuisement, aptitudes rechargées.",
+      "benefices": [
+        "Vous récupérez tous vos pv et tous vos dés de vie dépensés. Un maximum de pv réduit revient à la normale.",
+        "Les valeurs de caractéristique réduites reviennent à la normale.",
+        "Le niveau d'Épuisement diminue de 1.",
+        "Les aptitudes à recharge « Repos long » se rechargent.",
+        "Les pv temporaires disparaissent (p. 29)."
+      ],
+      "interruption": ["Jouer l'Initiative", "Lancer un sort autre qu'un sort mineur", "Subir des dégâts", "1 heure de marche ou d'effort comparable"],
+      "siInterrompu": "Après au moins 1 heure de repos : bénéfices d'un Repos court. Le repos peut reprendre, avec 1 heure de plus par interruption.",
+      "effets": { "recharge": ["repos-court", "repos-long"], "pv": "max", "desDeVie": "tous", "epuisement": -1, "pvTemporaires": 0 }
+    }
+  }
+}

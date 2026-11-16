@@ -1,0 +1,7 @@
+# Manuel sous droit d'auteur : jamais dans le dépôt
+reference/
+
+node_modules/
+dist/
+*.local
+.DS_Store
