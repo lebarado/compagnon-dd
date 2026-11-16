@@ -1,65 +1,119 @@
-import { useEffect, useReducer, useState } from 'react'
-import { personnageVierge, reducteur } from './etat/personnage'
-import { charger, enregistrer } from './etat/stockage'
+import { useCallback, useEffect, useState } from 'react'
+import { chargerPack, definirRegles } from './regles/pack'
+import type { Pack } from './regles/types'
+import { incantationDe, sortsAccordes, sortsChoisis } from './regles/calculs'
+import { reducteur, type Action, type Personnage } from './etat/personnage'
+import { chargerTous, enregistrerTous } from './etat/stockage'
 import { Perso } from './ecrans/Perso'
-import { Saisie } from './ecrans/Saisie'
+import { Combat } from './ecrans/Combat'
+import { Sorts } from './ecrans/Sorts'
+import { Sac } from './ecrans/Sac'
+import { Carnet } from './ecrans/Carnet'
+import { Encyclopedie } from './ecrans/Encyclopedie'
+import { Creation } from './ecrans/Creation'
+import { Personnages } from './ecrans/Personnages'
+import { ImportPack } from './ecrans/ImportPack'
 
-const ONGLETS = [
-  { id: 'perso', nom: 'Perso' },
-  { id: 'combat', nom: 'Combat', etape: 3 },
-  { id: 'inventaire', nom: 'Inventaire', etape: 4 },
-  { id: 'repos', nom: 'Repos', etape: 5 },
-  { id: 'carnet', nom: 'Carnet', etape: 6 },
-] as const
+type IdOnglet = 'perso' | 'combat' | 'sorts' | 'sac' | 'carnet' | 'regles'
+type Vue = 'onglets' | 'creation' | 'personnages' | 'pack'
 
-type IdOnglet = (typeof ONGLETS)[number]['id']
+const initial = chargerTous()
+
+/** Un personnage dont la classe ou l'espèce manque au pack ne peut pas être affiché. */
+function compatible(p: Personnage, pack: Pack) {
+  return !!pack.classes[p.classe] && !!pack.especes[p.espece] && !!pack.historiques[p.historique]
+}
 
 export function App() {
-  const [p, dispatch] = useReducer(reducteur, null, () => charger())
+  const [pack, setPack] = useState<Pack | null | undefined>(undefined)
+  const [personnages, setPersonnages] = useState<Personnage[]>(initial.personnages)
+  const [actif, setActif] = useState<string | null>(initial.actif)
   const [onglet, setOnglet] = useState<IdOnglet>('perso')
-  const [edition, setEdition] = useState(false)
+  const [vue, setVue] = useState<Vue>('onglets')
 
   useEffect(() => {
-    if (p) enregistrer(p)
-  }, [p])
+    chargerPack().then((p) => {
+      if (p) definirRegles(p)
+      setPack(p)
+    })
+  }, [])
 
-  // Chaque changement d'écran repart du haut : les PV sont toujours la première chose visible.
-  const existe = p !== null
+  useEffect(() => {
+    enregistrerTous(personnages, actif)
+  }, [personnages, actif])
+
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [onglet, edition, existe])
+  }, [onglet, vue, actif])
 
-  if (!p) return <Saisie mode="creation" initial={personnageVierge()} onValider={(personnage) => dispatch({ type: 'creer', personnage })} />
+  const p = personnages.find((x) => x.id === actif) ?? null
+  const dispatch = useCallback(
+    (a: Action) => setPersonnages((liste) => liste.map((x) => (x.id === actif ? (reducteur(x, a) ?? x) : x))),
+    [actif],
+  )
+  const installer = (nouveau: Pack) => {
+    definirRegles(nouveau)
+    setPack(nouveau)
+    setVue('onglets')
+  }
 
-  if (edition) {
+  if (pack === undefined) return <main className="ecran vide" aria-busy="true" />
+  if (pack === null || vue === 'pack') return <ImportPack onPack={installer} onAnnuler={pack ? () => setVue('onglets') : undefined} />
+
+  const utilisables = personnages.filter((x) => compatible(x, pack))
+  if (vue === 'creation' || utilisables.length === 0) {
     return (
-      <Saisie
-        mode="modification"
-        initial={p}
-        onAnnuler={() => setEdition(false)}
-        onValider={(personnage) => {
-          dispatch({ type: 'modifier', personnage })
-          setEdition(false)
+      <Creation
+        onAnnuler={utilisables.length ? () => setVue('onglets') : undefined}
+        onCreer={(nouveau) => {
+          const cree = reducteur(null, { type: 'creer', personnage: nouveau })!
+          setPersonnages((l) => [...l, cree])
+          setActif(cree.id)
+          setOnglet('perso')
+          setVue('onglets')
         }}
       />
     )
   }
 
-  const actif = ONGLETS.find((o) => o.id === onglet)!
+  if (vue === 'personnages' || !p || !compatible(p, pack)) {
+    return (
+      <Personnages
+        personnages={utilisables}
+        actif={actif}
+        version={pack.meta.version}
+        onChoisir={(id) => (setActif(id), setVue('onglets'))}
+        onNouveau={() => setVue('creation')}
+        onSupprimer={(id) => setPersonnages((l) => l.filter((x) => x.id !== id))}
+        onImporter={(liste) => setPersonnages((l) => [...l.filter((x) => !liste.some((y) => y.id === x.id)), ...liste])}
+        onChangerPack={() => setVue('pack')}
+        onFermer={p && compatible(p, pack) ? () => setVue('onglets') : undefined}
+      />
+    )
+  }
+
+  const lanceur = !!incantationDe(p) || sortsAccordes(p).length > 0 || sortsChoisis(p).length > 0
+  const onglets: { id: IdOnglet; nom: string }[] = [
+    { id: 'perso', nom: 'Perso' },
+    { id: 'combat', nom: 'Combat' },
+    ...(lanceur ? [{ id: 'sorts' as const, nom: 'Sorts' }] : []),
+    { id: 'sac', nom: 'Sac' },
+    { id: 'carnet', nom: 'Carnet' },
+    { id: 'regles', nom: 'Règles' },
+  ]
+  const courant = onglet === 'sorts' && !lanceur ? 'perso' : onglet
 
   return (
     <>
-      {onglet === 'perso' ? (
-        <Perso p={p} dispatch={dispatch} onModifier={() => setEdition(true)} />
-      ) : (
-        <main className="ecran vide">
-          <h1>{actif.nom}</h1>
-          <p className="aide">Cet écran arrive à l'étape {'etape' in actif ? actif.etape : ''}.</p>
-        </main>
-      )}
-      <nav className="barre" aria-label="Écrans">
-        {ONGLETS.map((o) => (
-          <button key={o.id} className={o.id === onglet ? 'actif' : ''} aria-current={o.id === onglet ? 'page' : undefined} onClick={() => setOnglet(o.id)}>
+      {courant === 'perso' && <Perso p={p} dispatch={dispatch} onPersonnages={() => setVue('personnages')} />}
+      {courant === 'combat' && <Combat p={p} dispatch={dispatch} />}
+      {courant === 'sorts' && <Sorts p={p} dispatch={dispatch} />}
+      {courant === 'sac' && <Sac p={p} dispatch={dispatch} />}
+      {courant === 'carnet' && <Carnet p={p} dispatch={dispatch} />}
+      {courant === 'regles' && <Encyclopedie p={p} />}
+      <nav className="barre" aria-label="Écrans" style={{ gridTemplateColumns: `repeat(${onglets.length}, 1fr)` }}>
+        {onglets.map((o) => (
+          <button key={o.id} className={o.id === courant ? 'actif' : ''} aria-current={o.id === courant ? 'page' : undefined} onClick={() => setOnglet(o.id)}>
             {o.nom}
           </button>
         ))}

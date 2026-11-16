@@ -5,3 +5,8 @@ node_modules/
 dist/
 *.local
 .DS_Store
+
+# Règles tirées du manuel : usage personnel, jamais publiées
+manuel/
+data/
+public/pack-manuel.json

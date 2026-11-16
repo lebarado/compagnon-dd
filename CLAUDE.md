@@ -21,7 +21,9 @@ PWA de fiche de personnage et de carnet de campagne pour Donjons & Dragons (règ
 
 À chaque étape : livrer quelque chose de testable, dire quoi tester en 3 lignes, attendre le retour.
 
-État : étape 2 codée (saisie initiale + PERSO), en attente de mise en ligne et du retour sur téléphone.
+État : étape 2 en ligne (saisie initiale + PERSO), en attente du retour sur téléphone.
+
+En ligne : https://lebarado.github.io/compagnon-dd/ (dépôt `lebarado/compagnon-dd`, public). Un push sur `main` teste, compile et redéploie (`.github/workflows/pages.yml`). Les commits de ce dépôt utilisent l'adresse noreply GitHub, pas l'adresse personnelle.
 
 ## Commandes
 
