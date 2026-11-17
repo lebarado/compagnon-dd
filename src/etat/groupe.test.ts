@@ -36,6 +36,14 @@ describe.skipIf(!packPresent)('partie : concentration, rounds, groupe', () => {
     expect(r(p, { type: 'phase', phase: 'hors' }).combat.round).toBe(0)
   })
 
+  it('tour suivant : action, Bonus et Réaction reviennent, les ennemis restent ; fin du combat efface tout', () => {
+    let p = r(moine(), { type: 'ennemi', ennemi: { id: 'g', nom: 'Gobelin', sante: 'forme' } }, { type: 'nouveauTour' })
+    p = r(p, { type: 'utiliser', place: 'action', demande: { id: 'esquive', nom: 'Esquive', effets: ['esquive'] } }, { type: 'utiliser', place: 'reaction', demande: { id: 'x', nom: 'x' } })
+    p = r(p, { type: 'ennemi', ennemi: { id: 'g', nom: 'Gobelin', sante: 'affaibli' } }, { type: 'nouveauTour' })
+    expect(p.combat).toMatchObject({ round: 2, cases: {}, effets: [], ennemis: [{ id: 'g', sante: 'affaibli' }] })
+    expect(r(p, { type: 'finCombat' }).combat).toMatchObject({ round: 0, ennemis: [] })
+  })
+
   it('la carte publique ne montre ni PV ni chiffres de la fiche', () => {
     const max = pvMax(moine())
     const carte = carteDe(moine({ pv: Math.floor(max / 2) }))

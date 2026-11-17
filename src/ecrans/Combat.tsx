@@ -4,8 +4,8 @@ import { armeDe, attaqueArme, calculer, classeArmure, emplacements, mainsNues, f
 import { abordable, contraintes, couts, deplacement, etatsActifs, libelle, optionsPour, regleOption, sortsLancables, type TempsSort } from '../regles/options'
 import { metres } from '../regles/noms'
 import type { Emplacement, OptionCombat, Sort } from '../regles/types'
-import type { Action, Personnage } from '../etat/personnage'
-import type { Case, Demande, Place } from '../etat/combat'
+import { nouvelId, type Action, type Personnage } from '../etat/personnage'
+import type { Case, Demande, Ennemi, Place, SanteEnnemi } from '../etat/combat'
 import { ChoixDe, Feuille, FeuilleRegle, type Affichable } from '../composants/Feuille'
 import { FeuilleSort } from './Sorts'
 import { PointsDeVie } from '../composants/PointsDeVie'
@@ -75,6 +75,102 @@ function Armes({ p }: { p: Personnage }) {
       </span>
       {armes.length === 0 && <span>Équipe une arme dans le Sac pour la voir ici.</span>}
     </span>
+  )
+}
+
+const SANTE: { id: SanteEnnemi; nom: string }[] = [
+  { id: 'forme', nom: 'En forme' },
+  { id: 'affaibli', nom: 'Affaibli' },
+  { id: 'tres-faible', nom: 'Très faible' },
+  { id: 'vaincu', nom: 'Vaincu' },
+]
+
+/** Ennemis : un nom et leur état apparent. Toucher l'état le fait passer au suivant. */
+function Ennemis({ ennemis, dispatch }: { ennemis: Ennemi[]; dispatch: Dispatch<Action> }) {
+  const [ajout, setAjout] = useState(false)
+  const [edition, setEdition] = useState<Ennemi | null>(null)
+  const [nom, setNom] = useState('')
+  const [nombre, setNombre] = useState(1)
+  const suivant = (s: SanteEnnemi) => SANTE[(SANTE.findIndex((x) => x.id === s) + 1) % SANTE.length].id
+  const ajouter = () => {
+    const base = nom.trim() || 'Ennemi'
+    for (let i = 1; i <= nombre; i++) dispatch({ type: 'ennemi', ennemi: { id: nouvelId(), nom: nombre > 1 ? `${base} ${i}` : base, sante: 'forme' } })
+    setNom('')
+    setNombre(1)
+    setAjout(false)
+  }
+  const restants = ennemis.filter((e) => e.sante !== 'vaincu').length
+  return (
+    <section className="case">
+      <header className="case-tete">
+        <h2>
+          <Icone nom="ennemis" taille={22} className="accent" />
+          Ennemis {ennemis.length > 0 && <span className="note">{restants} debout</span>}
+        </h2>
+        <button className="bouton discret petit" onClick={() => setAjout(true)}>
+          + Ajouter
+        </button>
+      </header>
+      {ennemis.length === 0 ? (
+        <p className="aide case-vide">Ajoute les ennemis pour suivre leur état.</p>
+      ) : (
+        <ul className="ennemis">
+          {ennemis.map((e) => (
+            <li key={e.id} className={e.sante === 'vaincu' ? 'vaincu' : ''}>
+              <button className="ennemi-nom" onClick={() => setEdition(e)}>
+                <strong>{e.nom}</strong>
+                {e.note && <small>{e.note}</small>}
+              </button>
+              <button className={`sante-ennemi ${e.sante}`} aria-label={`${e.nom} : ${SANTE.find((x) => x.id === e.sante)!.nom}. Toucher pour changer`} onClick={() => dispatch({ type: 'ennemi', ennemi: { ...e, sante: suivant(e.sante) } })}>
+                <span className="jauge-ennemi" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                {SANTE.find((x) => x.id === e.sante)!.nom}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {ajout && (
+        <Feuille titre="Ajouter des ennemis" onFermer={() => setAjout(false)}>
+          <input className="champ" placeholder="Nom (Gobelin, Loup…)" value={nom} autoFocus onChange={(ev) => setNom(ev.target.value)} />
+          <span className="etiquette">Combien ?</span>
+          <div className="puces">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <button key={n} className={`puce ${nombre === n ? 'choisi' : ''}`} onClick={() => setNombre(n)}>
+                {n}
+              </button>
+            ))}
+          </div>
+          <button className="bouton principal large" onClick={ajouter}>
+            Ajouter {nombre > 1 ? `${nombre} ennemis` : "l'ennemi"}
+          </button>
+        </Feuille>
+      )}
+      {edition && (
+        <Feuille titre={edition.nom} onFermer={() => (dispatch({ type: 'ennemi', ennemi: { ...edition, nom: edition.nom.trim() || 'Ennemi' } }), setEdition(null))}>
+          <input className="champ" value={edition.nom} onChange={(ev) => setEdition({ ...edition, nom: ev.target.value })} aria-label="Nom" />
+          <div className="puces">
+            {SANTE.map((s) => (
+              <button key={s.id} className={`puce sante-ennemi ${s.id} ${edition.sante === s.id ? 'choisi' : ''}`} onClick={() => setEdition({ ...edition, sante: s.id })}>
+                {s.nom}
+              </button>
+            ))}
+          </div>
+          <input className="champ" placeholder="Note : CA devinée, résiste au feu…" value={edition.note ?? ''} onChange={(ev) => setEdition({ ...edition, note: ev.target.value })} />
+          <div className="ligne-boutons">
+            <button className="bouton" onClick={() => (dispatch({ type: 'retirerEnnemi', id: edition.id }), setEdition(null))}>
+              Retirer
+            </button>
+            <button className="bouton principal" onClick={() => (dispatch({ type: 'ennemi', ennemi: { ...edition, nom: edition.nom.trim() || 'Ennemi' } }), setEdition(null))}>
+              OK
+            </button>
+          </div>
+        </Feuille>
+      )}
+    </section>
   )
 }
 
@@ -274,10 +370,8 @@ export function Combat({ p, dispatch }: Props) {
   }
 
   const touche = optionsPour(p, 'touche')
-  const toucheVisibles = touche.filter((o) => {
-    if (o.necessite) return c.cases.bonus?.id === o.necessite
-    return c.phase === 'tour' || c.cases.reaction?.id === 'attaque-opportunite'
-  })
+  // Options « sur une touche » liées à une action Bonus (Déluge de coups…) : seulement après celle-ci.
+  const toucheVisibles = touche.filter((o) => !o.necessite || c.cases.bonus?.id === o.necessite)
   const blocTouche = toucheVisibles.length > 0 && (
     <Bloc titre="Sur une touche" icone="touche" key="touche">
       {toucheVisibles.map((o) =>
@@ -305,7 +399,7 @@ export function Combat({ p, dispatch }: Props) {
     </Bloc>
   )
 
-  const autres = [...(c.phase === 'tour' ? [...optionsPour(p, 'debut-de-tour'), ...optionsPour(p, 'fin-de-tour')] : []), ...optionsPour(p, 'declencheur')]
+  const autres = [...optionsPour(p, 'debut-de-tour'), ...optionsPour(p, 'fin-de-tour'), ...optionsPour(p, 'declencheur')]
   const blocAutres = autres.length > 0 && (
     <Bloc titre="Autres" icone="autres" key="autres">
       {lignes('libre', autres)}
@@ -315,7 +409,7 @@ export function Combat({ p, dispatch }: Props) {
   const actifs = etatsActifs(p)
   const blocEtats = (
     <Bloc
-      titre="États"
+      titre="Mes états"
       icone="etats"
       key="etats"
       note={
@@ -346,93 +440,17 @@ export function Combat({ p, dispatch }: Props) {
 
   const effetsVisibles = [...new Set(c.effets)].filter((e) => !(e === 'esquive' && (k.neutralise || k.vitesseZero)))
   const dep = deplacement(p, c.effets)
-
-  let corps: ReactNode
-  if (c.phase === 'hors') {
-    corps = (
-      <>
-        <Bloc titre={<>Initiative <span className="chiffre-moyen">{formatMod(initiative(p))}</span></>} icone="initiative">
-          {optionsPour(p, 'initiative').length ? lignes('libre', optionsPour(p, 'initiative')) : <p className="aide">Lance 1d20 {formatMod(initiative(p))}.</p>}
-        </Bloc>
-        {blocEtats}
-      </>
-    )
-  } else if (c.phase === 'attente') {
-    corps = (
-      <>
-        {blocCase(
-          'reaction',
-          <>
-            {lignes('reaction', optionsPour(p, 'reaction'))}
-            {ligneSort('reaction')}
-          </>,
-        )}
-        {blocTouche}
-        {blocAutres}
-        {blocEtats}
-      </>
-    )
-  } else {
-    corps = (
-      <>
-        {blocCase(
-          'action',
-          <>
-            {lignes('action', optionsPour(p, 'action'))}
-            {ligneSort('action')}
-            <div className="ligne-option">
-              <button className="option-principale discrete" onClick={() => setFeuille('actions')}>
-                <span className="option-texte">
-                  <strong>Autre action</strong>
-                  <small>Esquive, Pointe, Soutien…</small>
-                </span>
-              </button>
-            </div>
-          </>,
-        )}
-        {blocCase(
-          'bonus',
-          <>
-            {lignes('bonus', optionsPour(p, 'bonus'))}
-            {ligneSort('bonus')}
-            {optionsPour(p, 'bonus').length === 0 && sortsLancables(p, 'bonus').length === 0 && <p className="aide">Aucune action Bonus disponible.</p>}
-          </>,
-        )}
-        <section className="case case-ligne">
-          <h2>
-            <Icone nom="vitesse" taille={22} className="accent" />
-            Déplacement
-          </h2>
-          <strong className="chiffre-moyen">{metres(dep)}</strong>
-        </section>
-        {k.aTerre && <p className="aide">À terre : se relever coûte la moitié de ta Vitesse (p. 360).</p>}
-        {blocTouche}
-        {blocCase(
-          'reaction',
-          <>
-            {lignes('reaction', optionsPour(p, 'reaction'))}
-            {ligneSort('reaction')}
-          </>,
-          true,
-        )}
-        {blocAutres}
-        {blocEtats}
-      </>
-    )
-  }
-
-  const titrePhase = { hors: 'Hors combat', attente: 'Tour des autres', tour: 'Mon tour' }[c.phase]
-  const bouton = { hors: 'Initiative jouée', attente: 'Mon tour', tour: 'Fin de tour' }[c.phase]
-  const suivante = ({ hors: 'attente', attente: 'tour', tour: 'attente' } as const)[c.phase]
+  const enCombat = c.round > 0 || (c.ennemis ?? []).length > 0
+  const optionsInitiative = optionsPour(p, 'initiative')
 
   return (
     <main className="ecran avec-action">
       <header className="tete-combat">
         <div className="phase">
-          <Icone nom={c.phase === 'tour' ? 'combat' : c.phase === 'attente' ? 'tour' : 'initiative'} taille={26} className="accent" />
+          <Icone nom="combat" taille={26} className="accent" />
           <span className="phase-texte">
-            <strong>{titrePhase}</strong>
-            {c.round > 0 && <span className="round">Round {c.round}</span>}
+            <strong>Combat</strong>
+            <span className="round">{c.round > 0 ? `Round ${c.round}` : `Initiative ${formatMod(initiative(p))}`}</span>
           </span>
         </div>
         <button
@@ -443,8 +461,8 @@ export function Combat({ p, dispatch }: Props) {
         >
           <Icone nom="inspiration" taille={24} />
         </button>
-        {c.phase !== 'hors' && (
-          <button className="bouton discret petit" onClick={() => dispatch({ type: 'phase', phase: 'hors' })}>
+        {enCombat && (
+          <button className="bouton discret petit" onClick={() => dispatch({ type: 'finCombat' })}>
             Fin du combat
           </button>
         )}
@@ -498,10 +516,56 @@ export function Combat({ p, dispatch }: Props) {
           })}
         </div>
       )}
-      {corps}
+      <Ennemis ennemis={c.ennemis ?? []} dispatch={dispatch} />
+      {c.round === 0 && optionsInitiative.length > 0 && (
+        <Bloc titre="Au jet d'initiative" icone="initiative">
+          {lignes('libre', optionsInitiative)}
+        </Bloc>
+      )}
+      {blocCase(
+        'action',
+        <>
+          {lignes('action', optionsPour(p, 'action'))}
+          {ligneSort('action')}
+          <div className="ligne-option">
+            <button className="option-principale discrete" onClick={() => setFeuille('actions')}>
+              <span className="option-texte">
+                <strong>Autre action</strong>
+                <small>Esquive, Pointe, Soutien…</small>
+              </span>
+            </button>
+          </div>
+        </>,
+      )}
+      {(optionsPour(p, 'bonus').length > 0 || sortsLancables(p, 'bonus').length > 0 || c.cases.bonus) &&
+        blocCase(
+          'bonus',
+          <>
+            {lignes('bonus', optionsPour(p, 'bonus'))}
+            {ligneSort('bonus')}
+          </>,
+        )}
+      <section className="case case-ligne">
+        <h2>
+          <Icone nom="vitesse" taille={22} className="accent" />
+          Déplacement
+        </h2>
+        <strong className="chiffre-moyen">{metres(dep)}</strong>
+      </section>
+      {k.aTerre && <p className="aide">À terre : se relever coûte la moitié de ta Vitesse (p. 360).</p>}
+      {blocTouche}
+      {blocCase(
+        'reaction',
+        <>
+          {lignes('reaction', optionsPour(p, 'reaction'))}
+          {ligneSort('reaction')}
+        </>,
+      )}
+      {blocAutres}
+      {blocEtats}
 
-      <button className="bouton principal bouton-tour" onClick={() => dispatch({ type: 'phase', phase: suivante })}>
-        {bouton}
+      <button className="bouton principal bouton-tour" onClick={() => dispatch({ type: 'nouveauTour' })}>
+        {c.round === 0 ? 'Commencer : mon 1er tour' : 'Tour suivant'}
       </button>
 
       {feuille === 'actions' && (

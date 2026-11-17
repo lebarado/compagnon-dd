@@ -12,7 +12,9 @@ const ICONES = {
   vitesse: 'walking-boot', repos: 'campfire', niveau: 'upgrade', mort: 'skull-crossed-bones', action: 'sword-clash', bonus: 'fast-forward-button',
   reaction: 'shield-reflect', touche: 'anvil-impact', autres: 'sparkles', etats: 'aura', tour: 'hourglass', sort: 'magic-swirl',
   inspiration: 'stars-stack', des: 'dice-twenty-faces-twenty', pieces: 'two-coins', recherche: 'magnifying-glass', note: 'scroll-quill',
-  ressource: 'crystal-ball',
+  ressource: 'crystal-ball', ennemis: 'crowned-skull',
+  // Rubriques des règles
+  classes: 'swordman', especes: 'elf-helmet', historiques: 'scroll-unfurled', dons: 'gift-of-knowledge', equipement: 'light-backpack',
   // Classes
   barbare: 'battle-axe', barde: 'lyre', clerc: 'holy-symbol', druide: 'oak-leaf', ensorceleur: 'fire-ray', guerrier: 'visored-helm',
   magicien: 'wizard-staff', moine: 'fist', occultiste: 'warlock-eye', paladin: 'templar-shield', rodeur: 'pocket-bow', roublard: 'plain-dagger',

@@ -1,7 +1,7 @@
 import type { IdCarac } from '../regles/types'
 import { regles } from '../regles/pack'
 import { mod, pvMax, ressourceMax, ressources, emplacements } from '../regles/calculs'
-import { changerPhase, combatVierge, retirerUn, type Case, type Demande, type EtatCombat, type Phase, type Place, type Utilisation } from './combat'
+import { changerPhase, combatVierge, nouveauTour, retirerUn, type Case, type Demande, type Ennemi, type EtatCombat, type Phase, type Place, type Utilisation } from './combat'
 
 /** État d'un personnage, sauvegardé localement. Aucune règle ici : des choix et des compteurs. */
 export interface ObjetInventaire {
@@ -138,6 +138,10 @@ export type Action =
   | { type: 'annuler'; place: Case | 'touche'; id?: string }
   | { type: 'sousChoix'; place: Case; demande: Demande }
   | { type: 'phase'; phase: Phase }
+  | { type: 'nouveauTour' }
+  | { type: 'finCombat' }
+  | { type: 'ennemi'; ennemi: Ennemi }
+  | { type: 'retirerEnnemi'; id: string }
   | { type: 'etat'; id: string }
   | { type: 'epuisement'; delta: number }
   | { type: 'jsMort'; resultat: 'reussite' | 'echec' | 'raz' }
@@ -316,6 +320,17 @@ export function reducteur(p: Personnage | null, a: Action): Personnage | null {
     }
     case 'phase':
       return { ...p, combat: changerPhase(p.combat, a.phase) }
+    case 'nouveauTour':
+      return { ...p, combat: nouveauTour(p.combat) }
+    case 'finCombat':
+      return { ...p, combat: combatVierge() }
+    case 'ennemi': {
+      const liste = p.combat.ennemis ?? []
+      const ennemis = liste.some((e) => e.id === a.ennemi.id) ? liste.map((e) => (e.id === a.ennemi.id ? a.ennemi : e)) : [...liste, a.ennemi]
+      return { ...p, combat: { ...p.combat, ennemis } }
+    }
+    case 'retirerEnnemi':
+      return { ...p, combat: { ...p.combat, ennemis: (p.combat.ennemis ?? []).filter((e) => e.id !== a.id) } }
     case 'etat': {
       const q = { ...p, etats: p.etats.includes(a.id) ? p.etats.filter((e) => e !== a.id) : [...p.etats, a.id] }
       // Neutralisé (ou un état qui l'inclut) met fin à la Concentration (p. 364).

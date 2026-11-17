@@ -583,6 +583,298 @@ h1 {
 .sante.grave { color: var(--alerte); }
 .sante.zero { color: var(--alerte); background: rgba(217, 88, 74, 0.15); }
 
+/* Règles : sommaire en tuiles, sections titrées */
+.rubriques {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rubrique {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 120px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--bord);
+  background: linear-gradient(160deg, rgba(220, 171, 79, 0.1), transparent 60%), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.06), 0 2px 8px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+
+.rubrique .icone {
+  color: var(--accent);
+}
+
+.rubrique strong {
+  font-family: var(--titre);
+  font-size: 0.95rem;
+}
+
+.rubrique small {
+  color: var(--discret);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.rubrique:active {
+  border-color: var(--accent);
+}
+
+.sommaire-regles .puce {
+  min-height: 40px;
+  font-size: 0.85rem;
+}
+
+.section-regles {
+  scroll-margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-regles h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.section-regles .liste {
+  border-radius: 14px;
+  border: 1px solid var(--bord);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.section-regles .liste li:first-child {
+  border-top: none;
+}
+
+.section-regles .liste small {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.liste.regles li.ligne-info,
+.ligne-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--bord);
+  font-size: 0.88rem;
+}
+
+.ligne-info:first-child {
+  border-top: none;
+}
+
+.ligne-info span {
+  color: var(--discret);
+}
+
+.ligne-info strong {
+  text-align: right;
+  font-weight: 600;
+}
+
+.fiche-tete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--discret);
+  font-size: 0.9rem;
+}
+
+.tete .retour {
+  min-width: 44px;
+  padding: 0;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.titre-regles {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Ennemis : nom à gauche, état apparent à droite (toucher = état suivant) */
+.case-vide {
+  padding: 0 16px 12px;
+}
+
+.ennemis {
+  display: flex;
+  flex-direction: column;
+}
+
+.ennemis li {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid var(--bord);
+}
+
+.ennemis li.vaincu {
+  opacity: 0.45;
+}
+
+.ennemis li.vaincu .ennemi-nom strong {
+  text-decoration: line-through;
+}
+
+.ennemi-nom {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.ennemi-nom small {
+  color: var(--discret);
+  font-size: 0.78rem;
+}
+
+.sante-ennemi {
+  --c: var(--dispo);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 108px;
+  padding: 6px 10px;
+  border: none;
+  border-left: 1px solid var(--bord);
+  background: none;
+  color: var(--c);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.sante-ennemi.affaibli { --c: var(--accent); }
+.sante-ennemi.tres-faible { --c: var(--alerte); }
+.sante-ennemi.vaincu { --c: var(--epuise); }
+
+.puce.sante-ennemi {
+  min-width: 0;
+  border: 1px solid var(--bord);
+  flex-direction: row;
+}
+
+.puce.sante-ennemi.choisi {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 15%, transparent);
+}
+
+.jauge-ennemi {
+  display: flex;
+  gap: 3px;
+}
+
+.jauge-ennemi span {
+  width: 18px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--c);
+}
+
+.sante-ennemi.affaibli .jauge-ennemi span:nth-child(3),
+.sante-ennemi.tres-faible .jauge-ennemi span:nth-child(n + 2),
+.sante-ennemi.vaincu .jauge-ennemi span {
+  background: #0b0907;
+  box-shadow: inset 0 0 0 1px var(--bord);
+}
+
+/* Création : explications et « ce que tu gagnes » */
+.explication {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--bronze);
+  background: linear-gradient(180deg, rgba(220, 171, 79, 0.08), transparent), var(--surface);
+  font-size: 0.9rem;
+}
+
+.explication ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.explication b {
+  color: var(--accent);
+}
+
+.gains {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gains h2 {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.gain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--bord);
+  background: var(--surface);
+  text-align: left;
+}
+
+button.gain {
+  position: relative;
+}
+
+button.gain .page {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+}
+
+.gain small,
+.gain-ligne small {
+  color: var(--discret);
+  font-size: 0.82rem;
+}
+
+.gain-ligne {
+  display: flex;
+  flex-direction: column;
+}
+
+.carac-desc {
+  display: block;
+  color: var(--discret);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
 .onglets-carnet {
   display: grid;
   grid-template-columns: 1fr 1fr;

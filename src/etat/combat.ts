@@ -44,9 +44,28 @@ export interface EtatCombat {
   effets: string[]
   /** Numéro du round, compté à chaque début de mon tour. */
   round: number
+  /** Ennemis du combat, avec leur état apparent : aucune statistique, seulement ce que je constate. */
+  ennemis: Ennemi[]
 }
 
-export const combatVierge = (): EtatCombat => ({ phase: 'hors', cases: {}, touches: [], effets: [], round: 0 })
+export type SanteEnnemi = 'forme' | 'affaibli' | 'tres-faible' | 'vaincu'
+
+export interface Ennemi {
+  id: string
+  nom: string
+  sante: SanteEnnemi
+  note?: string
+}
+
+export const combatVierge = (): EtatCombat => ({ phase: 'hors', cases: {}, touches: [], effets: [], round: 0, ennemis: [] })
+
+/**
+ * Tour suivant : action, action Bonus et Réaction reviennent (p. 373) ; les effets qui durent
+ * jusqu'au début ou à la fin de mon tour prennent fin. Les ennemis restent.
+ */
+export function nouveauTour(c: EtatCombat): EtatCombat {
+  return { ...c, phase: 'tour', cases: {}, touches: [], effets: retirerEffets(retirerEffets(c.effets, 'fin-de-tour'), 'debut-de-tour'), round: (c.round ?? 0) + 1 }
+}
 
 function expiration(id: string): Effet['jusqua'] | undefined {
   return regles?.combat.effets[id]?.jusqua
@@ -74,7 +93,7 @@ export function retirerUn(liste: string[], elements: string[]): string[] {
  */
 export function changerPhase(c: EtatCombat, phase: Phase): EtatCombat {
   if (phase === 'hors') return combatVierge()
-  if (phase === 'tour') return { phase, cases: {}, touches: [], effets: retirerEffets(c.effets, 'debut-de-tour'), round: (c.round ?? 0) + 1 }
+  if (phase === 'tour') return { ...c, phase, cases: {}, touches: [], effets: retirerEffets(c.effets, 'debut-de-tour'), round: (c.round ?? 0) + 1 }
   if (c.phase === 'tour') return { ...c, phase, touches: [], effets: retirerEffets(c.effets, 'fin-de-tour') }
-  return { ...combatVierge(), phase, round: c.round ?? 0 }
+  return { ...combatVierge(), phase, round: c.round ?? 0, ennemis: c.ennemis ?? [] }
 }

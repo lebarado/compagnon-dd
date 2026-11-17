@@ -301,10 +301,10 @@ export interface PointAVerifier {
 
 export interface Pack {
   meta: { version: string; source: string; aVerifier: PointAVerifier[] }
-  caracteristiques: { page: number; liste: { id: IdCarac; nom: string; abrev: string }[]; generation?: Regle[] }
+  caracteristiques: { page: number; liste: { id: IdCarac; nom: string; abrev: string; description?: string }[]; generation?: Regle[] }
   bonusMaitrise: { page: number; parNiveau: number[] }
   experience?: { page: number; parNiveau: number[] }
-  competences: { page: number; liste: { id: string; nom: string; carac: IdCarac }[] }
+  competences: { page: number; maitrise?: string; liste: { id: string; nom: string; carac: IdCarac; usage?: string }[] }
   emplacementsSorts: {
     page: number
     complet: number[][]

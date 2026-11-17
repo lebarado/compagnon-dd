@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { CARACS, regles } from '../regles/pack'
-import { choixEnAttente, formatMod, modificateur, pvMax, valeurCarac } from '../regles/calculs'
+import { bonusMaitrise, choixEnAttente, formatMod, modificateur, pvMax, valeurCarac } from '../regles/calculs'
 import { nomCarac, nomCompetence } from '../regles/noms'
 import { objetsDepuisNoms } from '../regles/equipement'
 import type { IdCarac, Regle } from '../regles/types'
@@ -127,9 +127,31 @@ export function Creation({ onCreer, onAnnuler }: Props) {
         />
       )
       break
-    case 'Historique':
+    case 'Historique': {
+      const don = historique ? regles.dons[historique.don] : null
+      const conseil = classe && historique ? classe.caracPrincipales.filter((c) => historique.caracteristiques.includes(c)) : []
       corps = (
         <>
+          {!historique && (
+            <div className="explication">
+              <strong>Ce que fait l'historique</strong>
+              <p>Ce que ton personnage faisait avant l'aventure. Il te donne, dès le niveau 1 :</p>
+              <ul>
+                <li>
+                  <b>+3 en caractéristiques</b>, à répartir sur trois caractéristiques proposées.
+                </li>
+                <li>
+                  <b>Un don d'origine</b> : un petit pouvoir permanent.
+                </li>
+                <li>
+                  <b>Deux compétences maîtrisées</b> : tu y ajoutes ton bonus de maîtrise.
+                </li>
+                <li>
+                  <b>Un outil maîtrisé</b> et ton <b>équipement de départ</b>.
+                </li>
+              </ul>
+            </div>
+          )}
           <Liste
             valeur={p.historique}
             onDetail={setDetail}
@@ -140,32 +162,77 @@ export function Creation({ onCreer, onAnnuler }: Props) {
               page: h.page,
               resume: '',
               detail: [`Caractéristiques : ${h.caracteristiques.map(nomCarac).join(', ')}`, `Don : ${regles.dons[h.don]?.nom ?? h.don}`, `Compétences : ${h.competences.map(nomCompetence).join(', ')}`, `Outils : ${h.outils}`],
-              sous: `${h.caracteristiques.map(nomCarac).join(', ')} · ${regles.dons[h.don]?.nom ?? h.don} · ${h.competences.map(nomCompetence).join(', ')}`,
+              sous: `Don ${regles.dons[h.don]?.nom ?? h.don} · ${h.competences.map(nomCompetence).join(', ')}`,
             }))}
           />
           {historique && (
-            <fieldset className="bloc">
-              <legend>Ajustements de caractéristique (p. 38)</legend>
-              <div className="puces">
-                {(['2-1', '1-1-1'] as const).map((m) => (
-                  <button key={m} className={`puce ${mode === m ? 'choisi' : ''}`} onClick={() => (setMode(m), setP({ ...p, bonusHistorique: {} }))}>
-                    {m === '2-1' ? '+2 et +1' : '+1, +1, +1'}
-                  </button>
-                ))}
+            <section className="gains">
+              <h2>Ce que te donne {historique.nom}</h2>
+              <fieldset className="bloc">
+                <legend>
+                  <b>1.</b> +3 en caractéristiques
+                </legend>
+                <p className="aide">
+                  S'ajoute aux valeurs que tu fixeras à l'étape Caractéristiques. Une caractéristique plus haute améliore les tests, attaques et sorts qui l'utilisent.
+                  {conseil.length > 0 && (
+                    <>
+                      {' '}
+                      <span className="accent">
+                        {classe!.nom} : mets le +2 en {conseil.map(nomCarac).join(' ou ')}.
+                      </span>
+                    </>
+                  )}
+                </p>
+                <div className="puces">
+                  {(['2-1', '1-1-1'] as const).map((m) => (
+                    <button key={m} className={`puce ${mode === m ? 'choisi' : ''}`} onClick={() => (setMode(m), setP({ ...p, bonusHistorique: {} }))}>
+                      {m === '2-1' ? '+2 et +1' : '+1, +1, +1'}
+                    </button>
+                  ))}
+                </div>
+                <div className="puces">
+                  {historique.caracteristiques.map((c) => (
+                    <button key={c} className={`puce ${p.bonusHistorique[c] ? 'choisi' : ''}`} onClick={() => basculerBonus(c)}>
+                      {nomCarac(c)} {p.bonusHistorique[c] ? `+${p.bonusHistorique[c]}` : ''}
+                    </button>
+                  ))}
+                </div>
+                <p className="aide">{mode === '2-1' ? 'Touche une fois pour +2, deux fois pour +1.' : 'Les trois caractéristiques gagnent +1.'}</p>
+              </fieldset>
+              {don && (
+                <button className="gain" onClick={() => setDetail({ ...don, nom: `Don : ${don.nom}` })}>
+                  <span className="etiquette">2. Don d'origine · toujours actif</span>
+                  <strong>{don.nom}</strong>
+                  <small>{don.resume}</small>
+                  <span className="page">p. {don.page}</span>
+                </button>
+              )}
+              <div className="gain">
+                <span className="etiquette">3. Compétences maîtrisées · + bonus de maîtrise</span>
+                {historique.competences.map((id) => {
+                  const c = regles.competences.liste.find((x) => x.id === id)
+                  return (
+                    <span key={id} className="gain-ligne">
+                      <strong>
+                        {c?.nom ?? id} <span className="note">({c ? nomCarac(c.carac) : ''})</span>
+                      </strong>
+                      {c?.usage && <small>{c.usage}</small>}
+                    </span>
+                  )
+                })}
               </div>
-              <div className="puces">
-                {historique.caracteristiques.map((c) => (
-                  <button key={c} className={`puce ${p.bonusHistorique[c] ? 'choisi' : ''}`} onClick={() => basculerBonus(c)}>
-                    {nomCarac(c)} {p.bonusHistorique[c] ? `+${p.bonusHistorique[c]}` : ''}
-                  </button>
-                ))}
+              <div className="gain">
+                <span className="etiquette">4. Outil maîtrisé et équipement</span>
+                <small>
+                  {historique.outils}. L'équipement se choisit à l'étape Équipement.
+                </small>
               </div>
-              <p className="aide">{mode === '2-1' ? 'Touche une fois pour +2, deux fois pour +1.' : 'Les trois caractéristiques gagnent +1.'}</p>
-            </fieldset>
+            </section>
           )}
         </>
       )
       break
+    }
     case 'Espèce':
       corps = (
         <Liste
@@ -221,7 +288,8 @@ export function Creation({ onCreer, onAnnuler }: Props) {
                 <div className="ligne-carac" key={c}>
                   <span className="nom">
                     {nomCarac(c)}
-                    {classe?.caracPrincipales.includes(c) && <span className="dispo"> ●</span>}
+                    {classe?.caracPrincipales.includes(c) && <span className="dispo"> ● {classe.nom}</span>}
+                    {regles.caracteristiques.liste.find((x) => x.id === c)?.description && <small className="carac-desc">{regles.caracteristiques.liste.find((x) => x.id === c)!.description}</small>}
                   </span>
                   <span className="mod">
                     {finale} {formatMod(modificateur(finale))}
@@ -267,12 +335,24 @@ export function Creation({ onCreer, onAnnuler }: Props) {
       break
     case 'Compétences':
       corps = classe && (
-        <EditeurChoix
-          p={brouillon}
-          choix={{ id: 'competences', nom: 'Compétences', type: 'competence', nombre: classe.maitrises.competences.nombre, parmi: classe.maitrises.competences.parmi }}
-          valeurs={p.competencesClasse}
-          onChange={(v) => setP({ ...p, competencesClasse: v })}
-        />
+        <>
+          <div className="explication">
+            <strong>
+              Choisis {classe.maitrises.competences.nombre} compétences de {classe.nom} ({p.competencesClasse.length}/{classe.maitrises.competences.nombre})
+            </strong>
+            <p>
+              Quand le MD demande un test (« fais un test de Sagesse (Perception) »), tu ajoutes ton bonus de maîtrise ({formatMod(bonusMaitrise(1))} au niveau 1) si tu maîtrises la compétence. Choisis celles que ton
+              personnage fera souvent.
+            </p>
+            {historique && <p className="accent">Déjà maîtrisées grâce à {historique.nom} : {historique.competences.map(nomCompetence).join(', ')}.</p>}
+          </div>
+          <EditeurChoix
+            p={brouillon}
+            choix={{ id: 'competences', nom: 'Compétences', type: 'competence', nombre: classe.maitrises.competences.nombre, parmi: classe.maitrises.competences.parmi }}
+            valeurs={p.competencesClasse}
+            onChange={(v) => setP({ ...p, competencesClasse: v })}
+          />
+        </>
       )
       break
     case 'Choix':

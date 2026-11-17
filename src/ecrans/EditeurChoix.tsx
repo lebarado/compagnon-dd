@@ -51,17 +51,24 @@ export function EditeurChoix({ p, choix, valeurs, onChange }: Props) {
       const dejaMaitrisees = competencesMaitrisees(p)
       const ids = choix.parmi ?? (choix.type === 'expertise' ? dejaMaitrisees : regles.competences.liste.map((c) => c.id))
       corps = (
-        <div className="puces">
+        <ul className="liste-choix">
           {ids.map((id) => {
             const choisi = valeurs.includes(id)
             const inutile = choix.type === 'competence' && !choisi && dejaMaitrisees.includes(id)
+            const c = regles.competences.liste.find((x) => x.id === id)
             return (
-              <button key={id} className={`puce ${choisi ? 'choisi' : ''}`} aria-pressed={choisi} disabled={inutile || (!choisi && plein && choix.nombre > 1)} onClick={() => basculer(id)}>
-                {nomCompetence(id)}
-              </button>
+              <li key={id} className={choisi ? 'choisi' : inutile ? 'inclus' : ''}>
+                <button className="choix-principal" aria-pressed={choisi} disabled={inutile || (!choisi && plein && choix.nombre > 1)} onClick={() => basculer(id)}>
+                  <strong>
+                    {choisi ? '✓ ' : ''}
+                    {nomCompetence(id)} <span className="note">{c ? nomCarac(c.carac) : ''}</span>
+                  </strong>
+                  <small>{inutile ? 'Déjà maîtrisée' : (c?.usage ?? '')}</small>
+                </button>
+              </li>
             )
           })}
-        </div>
+        </ul>
       )
       break
     }
