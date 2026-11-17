@@ -69,6 +69,7 @@ export function Combat({ p, dispatch }: Props) {
   /** Demande ce qu'il faut, puis utilise l'option. */
   const utiliser = (place: Place, o: OptionCombat) => {
     const demande: Demande = { id: o.id, nom: o.court ? `${o.nom} · ${o.court}` : o.nom, couts: couts(o), effets: o.effets, restaure: o.restaure }
+    if (o.pvTemp) demande.pvTemp = calculer(p, o.pvTemp)
     if (o.jet) {
       const des = texte(p, o.jet.des)
       const m = /^(\d+)d(\d+)$/.exec(des)
@@ -87,7 +88,7 @@ export function Combat({ p, dispatch }: Props) {
         return
       }
     }
-    if (place === 'libre' && !o.cout && !o.effets?.length && !o.restaure) {
+    if (place === 'libre' && !o.cout && !o.effets?.length && !o.restaure && !o.pvTemp) {
       setRegle(regleOption(p, o))
       return
     }

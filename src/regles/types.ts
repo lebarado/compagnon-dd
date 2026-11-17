@@ -55,6 +55,8 @@ export interface Effets {
   vitesse?: { bonus: string; conditions?: Condition[] }
   vitesses?: Partial<Record<'escalade' | 'nage' | 'vol', string>>
   pvMaxParNiveau?: number
+  /** Bonus fixe au maximum de pv (Faveur de vigueur). */
+  pvMaxBonus?: number
   maitriseSauvegardes?: IdCarac[] | 'toutes'
   competences?: string[]
   bonusCarac?: Partial<Record<IdCarac, number>> & { max?: number }
@@ -69,8 +71,8 @@ export interface Effets {
   initiative?: string
   /** Moitié du bonus de maîtrise aux tests de caractéristique non maîtrisés (Touche-à-tout). */
   demiMaitrise?: boolean
-  /** Option de combat simple apportée par un trait, un don ou une option choisie. */
-  optionCombat?: { emplacement: Emplacement; cout?: Cout; de?: string; effets?: string[] }
+  /** Option de combat apportée par un trait, un don ou une option choisie (nom et page repris de la source). */
+  optionCombat?: { emplacement: Emplacement } & Partial<Omit<OptionCombat, 'id' | 'emplacement'>>
   /** Attaque à mains nues améliorée (Arts martiaux, Bagarreur de tavernes). */
   mainsNues?: { de: string; caracs: IdCarac[]; armesMoine?: boolean; conditions?: Condition[] }
 }
@@ -121,6 +123,8 @@ export interface OptionCombat {
   jet?: { des: string; applique: 'soins' | 'pvTemp'; bonus?: string }
   /** Ressources restaurées : « tout », ou jusqu'à un minimum restant. */
   restaure?: Record<string, 'tout' | number>
+  /** Points de vie temporaires fixes reçus (formule). */
+  pvTemp?: string
 }
 
 export interface Incantation {
@@ -247,6 +251,8 @@ export interface Objet {
   page: number
   resume?: string
   categorie?: string
+  /** Contenu d'un paquetage, déballé dans l'inventaire à la création. */
+  contenu?: string[]
 }
 
 export interface Sort {

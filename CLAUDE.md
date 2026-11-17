@@ -1,41 +1,51 @@
 # Compagnon D&D
 
-PWA de fiche de personnage et de carnet de campagne pour Donjons & Dragons (règles 2024), utilisée sur téléphone à la table. Tout est en français.
+PWA de fiche de personnage et de carnet de campagne pour Donjons & Dragons (règles 2024), utilisée sur téléphone à la table. Tout est en français. Usage strictement personnel : l'utilisateur ne diffuse pas l'app.
 
 ## Périmètre
 
-- Personnage actuel : Nain Moine, historique Fermier, sous-classe Credo de la Paume au niveau 3. Niveaux 1 à 20.
-- La structure des règles est générique (classes, espèces, historiques, dons), mais seul le contenu de ce personnage est extrait. Ajouter une classe = extraire ses pages dans `data/regles.json` + coder ses mécaniques propres. Les sorts ne sont pas prévus.
-- Les combats et les dés se jouent en vrai : pas de combat tour par tour géré par l'app, pas de lanceur de dés.
-- Cinq écrans, barre en bas : PERSO, COMBAT, INVENTAIRE, REPOS ET PROGRESSION, CARNET.
+- Création de n'importe quel personnage (12 classes et leurs sous-classes, 10 espèces, 16 historiques, dons), niveaux 1 à 20.
+- Écrans : Perso, Combat, Sorts (lanceurs), Sac, Carnet, Règles (encyclopédie : règles, états, sorts, dons, équipement…). Plusieurs personnages.
+- Les combats et les dés se jouent en vrai : pas de lanceur de dés. L'app suit les ressources, les cases d'action du tour et les effets en cours.
+- Personnage de l'utilisateur : Nain Moine Fermier, Credo de la Paume (test de référence `src/test/pack.ts`).
 
-## Plan (une étape livrée et validée à la fois)
+## Le contenu du manuel est privé
 
-1. Extraction des règles → `data/regles.json` (fait)
-2. Écran PERSO + saisie initiale + PWA + mise en ligne GitHub Pages
-3. Écran COMBAT
-4. Écran INVENTAIRE (extraire alors les tables d'armes, chapitre 6)
-5. Repos et progression (extraire alors les dons choisis et les Faveurs épiques)
-6. Carnet de campagne
-7. Finitions : export/import JSON, hors ligne, performance
+- Le dépôt GitHub est public : il ne contient **aucun** contenu du manuel. `reference/`, `manuel/`, `data/` et `public/pack-manuel.json` sont dans `.gitignore`.
+- Les règles sont un « pack » JSON construit localement (`python tools/construire_pack.py` → `public/pack-manuel.json`, validé au passage). L'app le charge au premier lancement : servi par le serveur local, ou importé comme fichier sur le téléphone (écran d'import), puis gardé en IndexedDB.
+- Le manuel n'est jamais recopié : `resume` (une ligne utile en partie) et `detail` (liste courte) sont reformulés. Chaque entrée porte `page` = page imprimée.
+- Ne jamais inventer une règle. Les versions en ligne (SRD) ne servent pas de source : seul le manuel 2024 fait foi. Signaler toute ambiguïté à l'utilisateur (`meta.aVerifier`).
 
-À chaque étape : livrer quelque chose de testable, dire quoi tester en 3 lignes, attendre le retour.
+## Sources du pack (`manuel/`, privé)
 
-État : étape 2 en ligne (saisie initiale + PERSO), en attente du retour sur téléphone.
+- `manuel/sources/*.py` : générateurs (une classe par fichier, `commun.py` pour les aides). Lancer depuis `manuel/sources` (`python classe_guerrier.py`) puis `python tools/construire_pack.py` depuis la racine.
+- `moine.json` vient d'une conversion ; ses sous-classes autres que la Paume sont ajoutées par `moine_sous_classes.py`.
+- Tables d'emplacements (`manuel/emplacements.json`) écrites par Barde (complet), Guerrier (tiers), Paladin (demi), Occultiste (pacte).
+- Sorts : `tools/extraire_sorts.py` découpe l'OCR en `reference/sorts-brut.json` ; les résumés sont rédigés dans `manuel/sources/sorts_*.py`. Identifiant de sort = `slug` du nom (minuscules, sans accents, œ→oe, autres caractères → `-`), identique dans `src/regles/noms.ts` et `commun.py`.
+- Formules (`src/regles/formule.ts`) : `niveau`, `bm`, `mod.X`, `carac.X`, `table.COL`, `dd`, `dd.sort`, `attaque.sort`, `de.mainsNues`, `max`, `min`, division entière. Modèles de texte : `{expr}` et `{+expr}` (signé).
+- `optionsCombat[].emplacement` : `action`, `bonus`, `reaction`, `touche`, `debut-de-tour`, `fin-de-tour`, `initiative`, `declencheur`.
+- Vocabulaire de l'édition française : Pointe (Dash), Soutien (Help), Furtivité (Hide), Intention (Ready), Agrippé (Grappled), Neutralisé (Incapacitated), Credo (Focus), Conduit divin, Second souffle, Fougue.
 
-En ligne : https://lebarado.github.io/compagnon-dd/ (dépôt `lebarado/compagnon-dd`, public). Un push sur `main` teste, compile et redéploie (`.github/workflows/pages.yml`). Les commits de ce dépôt utilisent l'adresse noreply GitHub, pas l'adresse personnelle.
+## Accès au manuel
+
+Le PDF (`reference/manuel-des-joueurs-2024.pdf`, scan) ne doit jamais être lu en entier. **Page PDF = page imprimée + 1.**
+
+- OCR Tesseract (fra, `reference/tessdata`) : `reference/ocr/p<N>.txt` (pleine page, N = page PDF, assemblé dans `reference/manuel-ocr.txt`) et `reference/ocr-col/p<N>g.txt` / `p<N>d.txt` (colonne par colonne, plus fiable ; `python -I tools/ocr_colonnes.py <début> <fin>`).
+- Quand l'OCR est douteux, lire l'image : `python -I tools/rendre_pages.py reference/manuel-des-joueurs-2024.pdf <dossier> 55 <page PDF>[:zone]…`, zones `a`/`b` (moitiés haute/basse), `g`/`d` (colonnes), `hg`, `hd`, `bg`, `bd`.
+- Pages imprimées : création 38-42, classes 50-175 (Moine 126-133), historiques 178-185, espèces 186-197, dons 198-211, équipement 212-235, sorts 236-343, glossaire 360-377.
 
 ## Commandes
 
-- `npm run dev` (serveur local, aussi dans `.claude/launch.json`), `npm test`, `npm run build`, `npm run regles`.
+- `npm run dev` (aussi dans `.claude/launch.json`), `npm test`, `npm run build`, `npm run regles` (= construire le pack).
 - Les scripts appellent `node node_modules/...` directement : le `&` du dossier `D&D` casse les raccourcis `.cmd` de npm sous Windows.
+- En ligne : https://lebarado.github.io/compagnon-dd/ (dépôt `lebarado/compagnon-dd`). Un push sur `main` teste, compile et redéploie (`.github/workflows/pages.yml`) ; les tests qui lisent le pack sont sautés en CI. Les commits utilisent l'adresse noreply GitHub.
 
 ## Code
 
-- `src/regles/regles.ts` : types et accès à `data/regles.json`. `src/regles/calculs.ts` : fonctions pures.
-- `src/etat/personnage.ts` : état, réducteur, dégâts et soins. `src/etat/stockage.ts` : localStorage.
-- `src/ecrans/` : un fichier par écran. `src/composants/Feuille.tsx` : panneau du bas (détail d'une règle, pavé).
-- Le niveau et l'ajustement de PV max dans « Modifier » sont provisoires, à remplacer par le passage de niveau guidé (étape 5).
+- `src/regles/types.ts` (schéma du pack), `pack.ts` (chargement, IndexedDB), `calculs.ts` (fonctions pures : caracs, CA, pv, ressources, sorts…), `options.ts` (options de combat), `formule.ts`, `equipement.ts`, `noms.ts`.
+- `src/etat/personnage.ts` (état v2, réducteur), `combat.ts` (tour en cours), `stockage.ts` (localStorage, export/import).
+- `src/ecrans/` : un fichier par écran ; `src/composants/Feuille.tsx` : panneau du bas.
+- Tests : `src/regles/*.test.ts`, `src/etat/*.test.ts`. Aucune régression à la montée de niveau.
 
 ## Contraintes de design (non négociables)
 
@@ -43,31 +53,6 @@ En ligne : https://lebarado.github.io/compagnon-dd/ (dépôt `lebarado/compagnon
 - En combat : seulement ce qui est faisable maintenant. Un titre, le coût, le dé. L'explication est à un appui et se referme facilement.
 - Boutons d'au moins 48 px, usage à une main, thème sombre par défaut.
 - Une couleur d'accent, une pour « disponible », une pour « épuisé ». Pas de décoration.
-- PV, CA et Credo sont les plus gros chiffres de l'écran.
-- PV, Credo, objets : un ou deux appuis, sans formulaire.
+- PV, CA et la ressource principale sont les plus gros chiffres de l'écran.
+- PV, ressources, objets : un ou deux appuis, sans formulaire.
 - En cas d'hésitation entre une fonctionnalité et un écran léger : écran léger, fonctionnalité proposée en option.
-
-## Technique
-
-- React + Vite + TypeScript, `vite-plugin-pwa`, Vitest. Pas de backend, aucune dépendance lourde.
-- Hébergement : GitHub Pages (dépôt public). `reference/` est dans `.gitignore` et ne doit jamais être publié.
-- Règles (`data/regles.json`) et état du personnage (stockage local, export/import JSON) sont séparés.
-- Calculs (modificateurs, CA, dé d'Arts martiaux, Credo max, PV max…) dans des fonctions pures testées. Aucune régression à la montée de niveau.
-
-## Règles : conventions de `data/regles.json`
-
-- Ne jamais inventer une règle. En cas de doute 2014/2024 : 2024. Signaler toute ambiguïté à l'utilisateur au lieu de trancher.
-- Chaque règle porte `page` = numéro imprimé du manuel. L'app l'affiche (« p. XX »).
-- Textes reformulés, jamais copiés : `resume` (une ligne, pour l'écran) et `detail` (liste, pour le dépliant).
-- `meta.aVerifier` liste les points douteux ; une règle concernée y renvoie par `aVerifier: "<id>"`.
-- `optionsCombat[].emplacement` : `action`, `bonus`, `reaction`, `touche`, `debut-de-tour`, `fin-de-tour`, `initiative`, `declencheur`.
-- Vocabulaire de l'édition française : Pointe (Dash), Soutien (Help), Furtivité (Hide), Intention (Ready), Agrippé (Grappled), Neutralisé (Incapacitated), Credo (Focus), Déluge de coups, Patience défensive, Porté par le vent.
-
-## Accès au manuel
-
-Le PDF (`reference/manuel-des-joueurs-2024.pdf`, 265 Mo, scan) ne doit jamais être lu en entier.
-
-- **Page PDF = page imprimée + 1.**
-- Texte OCR : `reference/manuel.txt`, une section `===== PDF PAGE n (manuel p. n-1) =====` par page, colonne gauche puis droite. Chercher avec Grep, lire seulement les lignes utiles. Régénérer : `python -I tools/extraire_texte.py reference/manuel-des-joueurs-2024.pdf reference/manuel.txt` (PyMuPDF requis ; `pdftotext` n'est pas installé).
-- L'OCR est souvent tronqué (moitié de colonne manquante, tables mélangées). Dans ce cas, rendre la page en image et la lire : `python -I tools/rendre_pages.py reference/manuel-des-joueurs-2024.pdf <dossier> 52 <page PDF>…` produit `p<N>a.png` (haut) et `p<N>b.png` (bas), lisibles à 52 dpi.
-- Pages imprimées utiles : caractéristiques 10, compétences 14, combat 23-29, création 40-42, Moine 127-129, Paume 133, Fermier 181, Nain 194, dons 199-202 et suivantes, glossaire (actions, états, repos) 360-377.

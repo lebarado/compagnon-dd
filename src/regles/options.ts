@@ -18,7 +18,7 @@ export function optionsDisponibles(p: Personnage): OptionCombat[] {
   for (const s of sources(p)) {
     const o = s.regle.optionCombat
     if (!o) continue
-    liste.push({ id: s.regle.id, nom: s.regle.nom, page: s.regle.page, resume: s.regle.resume, detail: s.regle.detail, niveau: 1, ...o })
+    liste.push({ id: s.regle.id, nom: s.regle.nom, page: s.regle.page, resume: s.regle.resume, detail: s.regle.detail, niveau: 1, ...o } as OptionCombat)
   }
   return liste
     .filter((o) => o.niveau <= p.niveau && conditionsRemplies(p, o.conditions))

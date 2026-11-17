@@ -8,7 +8,7 @@
     "build": "node node_modules/typescript/bin/tsc --noEmit && node node_modules/vite/bin/vite.js build",
     "preview": "node node_modules/vite/bin/vite.js preview",
     "test": "node node_modules/vitest/vitest.mjs run",
-    "regles": "python tools/verifier_regles.py"
+    "regles": "python tools/construire_pack.py"
   },
   "dependencies": {
     "react": "^19.3.1",

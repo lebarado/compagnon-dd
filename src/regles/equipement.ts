@@ -27,13 +27,15 @@ function trouver(nom: string): Entree | undefined {
 }
 
 /** Transforme une liste d'équipement de départ en objets d'inventaire. */
-export function objetsDepuisNoms(noms: string[]): ObjetInventaire[] {
-  return noms.map((brut) => {
+export function objetsDepuisNoms(noms: string[], profondeur = 0): ObjetInventaire[] {
+  return noms.flatMap((brut) => {
     const m = /^(\d+)\s+(.+)$/.exec(brut.trim())
     const quantite = m ? Number(m[1]) : 1
     const nom = m ? m[2] : brut.trim()
     const x = trouver(nom)
-    return { uid: nouvelId(), ref: x?.e.id, nom: x ? x.e.nom : nom, quantite, poids: x?.e.poids }
+    // Un paquetage est déballé : ses objets vont directement dans le sac.
+    if (x?.genre === 'objet' && x.e.contenu && profondeur === 0) return objetsDepuisNoms(x.e.contenu, 1)
+    return [{ uid: nouvelId(), ref: x?.e.id, nom: x ? x.e.nom : nom, quantite, poids: x?.e.poids }]
   })
 }
 

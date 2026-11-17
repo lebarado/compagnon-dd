@@ -83,7 +83,7 @@ export function EditeurChoix({ p, choix, valeurs, onChange }: Props) {
       const compte = (c: string) => valeurs.filter((v) => v === c).length
       corps = (
         <div>
-          {CARACS.map((c) => {
+          {CARACS.filter((c) => !choix.parmi || choix.parmi.includes(c)).map((c) => {
             const avant = valeurCarac({ ...p, choix: {} }, c)
             const actuel = valeurCarac(p, c)
             return (

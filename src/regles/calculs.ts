@@ -252,7 +252,8 @@ export function pvMax(p: Personnage, r?: R): number {
   const con = mod(p, 'con', rr)
   const base = de + con + (p.niveau - 1) * Math.max(1, de / 2 + 1 + con)
   const parNiveau = sources(p, rr).reduce((s, x) => s + (x.regle.pvMaxParNiveau ?? 0), 0)
-  return Math.max(1, base + parNiveau * p.niveau + p.ajustementPvMax)
+  const fixe = sources(p, rr).reduce((s, x) => s + (x.regle.pvMaxBonus ?? 0), 0)
+  return Math.max(1, base + parNiveau * p.niveau + fixe + p.ajustementPvMax)
 }
 
 export function maitriseSauvegarde(p: Personnage, carac: IdCarac, r?: R): boolean {

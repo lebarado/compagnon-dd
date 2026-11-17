@@ -186,8 +186,20 @@ def verifier_pack(pack):
 
     for id_s, s in pack["sorts"].items():
         verifier(0 <= s["niveau"] <= 9, f"sort {id_s} : niveau invalide")
+        verifier(s.get("id") == id_s, f"sort {id_s} : id différent de la clé")
+        verifier(isinstance(s.get("page"), int) and 239 <= s["page"] <= 343, f"sort {id_s} : page hors du chapitre 7")
+        verifier(bool(s.get("resume")), f"sort {id_s} : résumé manquant")
+        for champ in ("ecole", "incantation", "portee", "composantes", "duree"):
+            verifier(bool(s.get(champ)), f"sort {id_s} : {champ} manquant")
         for c in s["classes"]:
-            verifier(c in pack["classes"] or True, "")
+            verifier(c in pack["classes"], f"sort {id_s} : classe inconnue « {c} »")
+    # Toute liste de sorts de classe référencée doit exister dans au moins un sort.
+    if pack["sorts"]:
+        listes = {c for s in pack["sorts"].values() for c in s["classes"]}
+        for id_c, c in pack["classes"].items():
+            for inc in [c.get("incantation")] + [sc.get("incantation") for sc in c["sousClasses"].values()]:
+                if inc:
+                    verifier(inc["liste"] in listes, f"{id_c} : liste de sorts « {inc['liste']} » vide")
 
     ids = [g["id"] for g in pack["glossaire"]]
     doublons = {i for i in ids if ids.count(i) > 1}
@@ -205,6 +217,11 @@ if __name__ == "__main__":
     if erreurs:
         print("\n".join(erreurs))
         sys.exit(1)
+    # La version suit le contenu : l'app remplace son pack local dès qu'elle en voit un autre.
+    import hashlib
+    pack["meta"]["version"] = "contenu"
+    empreinte = hashlib.sha256(json.dumps(pack, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()[:10]
+    pack["meta"]["version"] = empreinte
     SORTIE.write_text(json.dumps(pack, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(
         f"pack-manuel.json : {len(pack['classes'])} classes, {sum(len(c['sousClasses']) for c in pack['classes'].values())} sous-classes, "
