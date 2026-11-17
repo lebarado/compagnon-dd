@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { regles } from '../regles/pack'
+import { Embleme } from '../composants/Icone'
 import { exporter, importer } from '../etat/stockage'
 import type { Personnage } from '../etat/personnage'
 import { Feuille } from '../composants/Feuille'
@@ -43,11 +44,14 @@ export function Personnages({ personnages, actif, version, onChoisir, onNouveau,
       <ul className="liste-choix">
         {personnages.map((p) => (
           <li key={p.id} className={p.id === actif ? 'choisi' : ''}>
-            <button className="choix-principal" onClick={() => onChoisir(p.id)}>
-              <strong>{p.nom}</strong>
-              <small>
-                {regles.especes[p.espece]?.nom ?? p.espece} · {regles.classes[p.classe]?.nom ?? p.classe} {p.niveau} · {p.pv} PV
-              </small>
+            <button className="choix-principal avec-vignette" onClick={() => onChoisir(p.id)}>
+              <Embleme classe={p.classe} espece={p.espece} taille={48} />
+              <span className="choix-texte">
+                <strong>{p.nom}</strong>
+                <small>
+                  {regles.especes[p.espece]?.nom ?? p.espece} · {regles.classes[p.classe]?.nom ?? p.classe} {p.niveau} · {p.pv} PV
+                </small>
+              </span>
             </button>
             <button className="lien-page" aria-label={`Supprimer ${p.nom}`} onClick={() => setASupprimer(p)}>
               ✕
@@ -91,6 +95,7 @@ export function Personnages({ personnages, actif, version, onChoisir, onNouveau,
       <section className="bloc">
         <span className="etiquette">Règles</span>
         <p className="aide">Pack de règles version {version}.</p>
+        <p className="aide">Icônes : game-icons.net (Lorc, Delapouite et al.), licence CC BY 3.0.</p>
         <button className="bouton discret" onClick={onChangerPack}>
           Charger un autre pack
         </button>

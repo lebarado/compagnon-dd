@@ -30,8 +30,10 @@ import {
 import { abrevCarac, metres, nomCarac } from '../regles/noms'
 import type { Action, Personnage } from '../etat/personnage'
 import { NIVEAU_MAX } from '../etat/personnage'
-import { ChoixDe, Feuille, FeuilleRegle, LigneRegle, Pave, type Affichable } from '../composants/Feuille'
+import { ChoixDe, Feuille, FeuilleRegle, LigneRegle, type Affichable } from '../composants/Feuille'
 import { EditeurChoix, FeuilleChoix } from './EditeurChoix'
+import { PointsDeVie } from '../composants/PointsDeVie'
+import { Embleme, Icone } from '../composants/Icone'
 
 interface Props {
   p: Personnage
@@ -235,13 +237,12 @@ function FeuilleFiche({ p, dispatch, onFermer }: { p: Personnage; dispatch: Disp
 }
 
 export function Perso({ p, dispatch, onPersonnages }: Props) {
-  const [feuille, setFeuille] = useState<'pv' | 'repos' | 'niveau' | 'fiche' | 'choix' | null>(null)
+  const [feuille, setFeuille] = useState<'repos' | 'niveau' | 'fiche' | 'choix' | null>(null)
   const [regle, setRegle] = useState<(Affichable & { cle?: string }) | null>(null)
   const [toutes, setToutes] = useState(false)
 
   const classe = classeDe(p)
   const sc = sousClasseDe(p)
-  const max = pvMax(p)
   const res = ressources(p).filter((r) => r.valeurMax > 0)
   const principale = ressourcePrincipale(p)
   const maitrisees = competencesMaitrisees(p)
@@ -254,18 +255,23 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
     <main className="ecran">
       <header className="tete">
         <button className="titre-perso" onClick={onPersonnages}>
+          <Embleme classe={p.classe} espece={p.espece} />
+          <span className="titre-texte">
           <h1>{p.nom}</h1>
           <p className="sous-titre">
             {regles.especes[p.espece]?.nom} · {classe.nom} {p.niveau}
             {sc ? ` (${sc.nom})` : ''} · {regles.historiques[p.historique]?.nom}
           </p>
+          </span>
         </button>
         <div className="actions-tete">
-          <button className="bouton discret" onClick={() => setFeuille('repos')}>
+          <button className="bouton discret avec-icone" onClick={() => setFeuille('repos')}>
+            <Icone nom="repos" taille={20} />
             Repos
           </button>
           {p.niveau < NIVEAU_MAX && (
-            <button className="bouton discret" onClick={() => setFeuille('niveau')}>
+            <button className="bouton discret avec-icone" onClick={() => setFeuille('niveau')}>
+              <Icone nom="niveau" taille={20} />
               Niv. +
             </button>
           )}
@@ -278,54 +284,17 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
         </button>
       )}
 
-      <section className="pv" aria-label="Points de vie">
-        <button className="bouton rond grand" aria-label="Perdre 1 point de vie" disabled={p.pv === 0 && p.pvTemp === 0} onClick={() => dispatch({ type: 'degats', montant: 1 })}>
-          −
-        </button>
-        <button className="pv-valeur" aria-label={`${p.pv} points de vie sur ${max}. Saisir un montant`} onClick={() => setFeuille('pv')}>
-          <span className={`pv-actuels ${p.pv === 0 ? 'epuise' : ''}`}>{p.pv}</span>
-          <span className="pv-max">/ {max} PV</span>
-          {p.pvTemp > 0 && <span className="pv-temp">+{p.pvTemp} temp.</span>}
-        </button>
-        <button className="bouton rond grand" aria-label="Gagner 1 point de vie" disabled={p.pv >= max} onClick={() => dispatch({ type: 'soins', montant: 1 })}>
-          +
-        </button>
-      </section>
-
-      {p.pv === 0 && (
-        <section className="mort">
-          <button className="lien-page" onClick={() => setRegle({ nom: '0 point de vie', ...regles.pointsDeVie.zeroPv })}>
-            Inconscient · p. {regles.pointsDeVie.zeroPv.page}
-          </button>
-          {(['reussite', 'echec'] as const).map((t) => {
-            const n = t === 'reussite' ? p.jsMort.reussites : p.jsMort.echecs
-            return (
-              <div className="ligne-mort" key={t}>
-                <span>{t === 'reussite' ? 'Réussites' : 'Échecs'}</span>
-                <span className="pastilles">
-                  {[0, 1, 2].map((i) => (
-                    <span key={i} className={`pastille ${i < n ? (t === 'reussite' ? 'dispo-fond' : 'alerte-fond') : ''}`} />
-                  ))}
-                </span>
-                <button className="bouton" disabled={n >= 3} onClick={() => dispatch({ type: 'jsMort', resultat: t })}>
-                  +1
-                </button>
-              </div>
-            )
-          })}
-          <p className="aide">
-            {p.jsMort.echecs >= 3 ? 'Trois échecs : mort.' : p.jsMort.reussites >= 3 ? 'Trois réussites : Stabilisé.' : '1d20 au début du tour : 10 ou plus = réussite. 1 = deux échecs, 20 = 1 PV (p. 29).'}
-          </p>
-        </section>
-      )}
+      <PointsDeVie p={p} dispatch={dispatch} />
 
       <section className="tuiles">
         <div className="tuile">
+          <Icone nom="ca" taille={64} className="filigrane" />
           <span className="etiquette">CA</span>
           <span className="chiffre">{classeArmure(p)}</span>
         </div>
         {principale ? (
           <div className="tuile">
+            <Icone nom="ressource" taille={64} className="filigrane" />
             <span className="etiquette">{principale.nom}</span>
             <span className={`chiffre ${ressourceRestante(p, principale.id) === 0 ? 'epuise' : 'dispo'}`}>
               {ressourceRestante(p, principale.id)}
@@ -342,6 +311,7 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
           </div>
         ) : (
           <button className={`tuile ${p.inspiration ? 'tuile-active' : ''}`} onClick={() => dispatch({ type: 'inspiration' })} aria-pressed={p.inspiration}>
+            <Icone nom="inspiration" taille={64} className="filigrane" />
             <span className="etiquette">Inspiration</span>
             <span className={`chiffre ${p.inspiration ? 'dispo' : 'epuise'}`}>{p.inspiration ? '★' : '☆'}</span>
             <span className="note">p. 368</span>
@@ -351,15 +321,15 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
 
       <section className="bandeau">
         <div>
-          <span className="etiquette">Vitesse</span>
+          <span className="etiquette"><Icone nom="vitesse" taille={16} /> Vitesse</span>
           <strong>{metres(vitesse(p))}</strong>
         </div>
         <div>
-          <span className="etiquette">Maîtrise</span>
+          <span className="etiquette"><Icone nom="des" taille={16} /> Maîtrise</span>
           <strong>{formatMod(bonusMaitrise(p.niveau))}</strong>
         </div>
         <div>
-          <span className="etiquette">Initiative</span>
+          <span className="etiquette"><Icone nom="initiative" taille={16} /> Initiative</span>
           <strong>{formatMod(initiative(p))}</strong>
         </div>
       </section>
@@ -460,17 +430,6 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
         Modifier la fiche
       </button>
 
-      {feuille === 'pv' && (
-        <Pave
-          titre="Points de vie"
-          onFermer={() => setFeuille(null)}
-          actions={[
-            { nom: 'Dégâts', onValider: (n) => dispatch({ type: 'degats', montant: n }) },
-            { nom: 'Soins', classe: 'dispo', onValider: (n) => dispatch({ type: 'soins', montant: n }) },
-            { nom: 'PV temp.', zeroAutorise: true, onValider: (n) => dispatch({ type: 'pvTemp', montant: n }) },
-          ]}
-        />
-      )}
       {feuille === 'repos' && <FeuilleRepos p={p} dispatch={dispatch} onFermer={() => setFeuille(null)} />}
       {feuille === 'niveau' && <FeuilleNiveau p={p} dispatch={dispatch} onFermer={() => setFeuille(null)} />}
       {feuille === 'fiche' && <FeuilleFiche p={p} dispatch={dispatch} onFermer={() => setFeuille(null)} />}

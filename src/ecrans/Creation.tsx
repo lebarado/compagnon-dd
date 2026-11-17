@@ -6,6 +6,7 @@ import { objetsDepuisNoms } from '../regles/equipement'
 import type { IdCarac, Regle } from '../regles/types'
 import { personnageVierge, type Personnage } from '../etat/personnage'
 import { FeuilleRegle, type Affichable } from '../composants/Feuille'
+import { aIcone, Icone } from '../composants/Icone'
 import { EditeurChoix } from './EditeurChoix'
 
 /** Création en étapes, dans l'ordre du chapitre 2 : classe, origine, caractéristiques, détails. */
@@ -25,9 +26,16 @@ function Liste({ entrees, valeur, onChoisir, onDetail }: { entrees: (Regle & { s
     <ul className="liste-choix">
       {entrees.map((e) => (
         <li key={e.id} className={valeur === e.id ? 'choisi' : ''}>
-          <button className="choix-principal" aria-pressed={valeur === e.id} onClick={() => onChoisir(e.id)}>
-            <strong>{e.nom}</strong>
-            <small>{e.sous}</small>
+          <button className="choix-principal avec-vignette" aria-pressed={valeur === e.id} onClick={() => onChoisir(e.id)}>
+            {aIcone(e.id) && (
+              <span className="vignette">
+                <Icone nom={e.id} taille={30} />
+              </span>
+            )}
+            <span className="choix-texte">
+              <strong>{e.nom}</strong>
+              <small>{e.sous}</small>
+            </span>
           </button>
           <button className="lien-page" onClick={() => onDetail(e)}>
             p. {e.page}

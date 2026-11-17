@@ -52,7 +52,8 @@ Le PDF (`reference/manuel-des-joueurs-2024.pdf`, scan) ne doit jamais être lu e
 - Un écran = une intention. 5 à 7 éléments visibles au plus ; le reste se déplie.
 - En combat : seulement ce qui est faisable maintenant. Un titre, le coût, le dé. L'explication est à un appui et se referme facilement.
 - Boutons d'au moins 48 px, usage à une main, thème sombre par défaut.
-- Une couleur d'accent, une pour « disponible », une pour « épuisé ». Pas de décoration.
+- Une couleur d'accent (or), une pour « disponible », une pour « épuisé ». Thème « taverne » (`src/styles-theme.css`, police Cinzel pour titres et chiffres) ; icônes game-icons.net (CC BY 3.0) extraites par `node tools/icones.mjs` dans `src/composants/icones-data.ts`, emblème de classe comme portrait.
+- PV : composant partagé `src/composants/PointsDeVie.tsx` (Perso et Combat).
 - PV, CA et la ressource principale sont les plus gros chiffres de l'écran.
 - PV, ressources, objets : un ou deux appuis, sans formulaire.
 - En cas d'hésitation entre une fonctionnalité et un écran léger : écran léger, fonctionnalité proposée en option.

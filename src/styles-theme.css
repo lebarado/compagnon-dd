@@ -1,0 +1,476 @@
+/* Thème « taverne et parchemin » : bois sombre, bronze, or. Chargé après les autres feuilles. */
+
+:root {
+  --fond: #120f0c;
+  --surface: #1d1814;
+  --surface-haute: #2a221b;
+  --bord: #3b3026;
+  --bronze: #8a6a3f;
+  --texte: #efe5d2;
+  --discret: #a89a86;
+  --accent: #dcab4f;
+  --dispo: #6fc28c;
+  --epuise: #6d665c;
+  --alerte: #d9584a;
+  --titre: 'Cinzel', Georgia, serif;
+}
+
+html,
+body {
+  background-color: var(--fond);
+  background-image:
+    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(220, 171, 79, 0.1), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .85 0 0 0 0 .6 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+.etiquette,
+.chiffre,
+.pv-actuels,
+.chiffre-moyen,
+.pave-valeur,
+.barre button span,
+.depliant summary {
+  font-family: var(--titre);
+}
+
+h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+.icone {
+  flex: none;
+  display: inline-block;
+  vertical-align: -0.2em;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.avec-icone {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Cartes : bois sombre bordé de bronze */
+.tuile,
+.case,
+.bloc,
+.depliant,
+.liste-choix li,
+.mort {
+  background: linear-gradient(180deg, rgba(255, 236, 200, 0.045), rgba(0, 0, 0, 0.12)), var(--surface);
+  border: 1px solid var(--bord);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.06), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.mort {
+  border-color: var(--alerte);
+}
+
+.liste-choix li.choisi {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(220, 171, 79, 0.25), 0 2px 10px rgba(220, 171, 79, 0.12);
+}
+
+.tuile {
+  position: relative;
+  overflow: hidden;
+}
+
+.tuile > *:not(.filigrane) {
+  position: relative;
+}
+
+.filigrane {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  width: 92px;
+  height: 92px;
+  color: var(--accent);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.bandeau,
+.caracs {
+  border: 1px solid var(--bord);
+}
+
+.bandeau > div,
+.caracs > div {
+  background: linear-gradient(180deg, rgba(255, 236, 200, 0.04), transparent), var(--surface);
+}
+
+.bandeau .etiquette {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bandeau .etiquette .icone {
+  color: var(--accent);
+}
+
+/* Boutons */
+.bouton {
+  background: linear-gradient(180deg, #33291f, #261f18);
+  border-color: var(--bord);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.08);
+}
+
+.bouton:active:not(:disabled) {
+  background: var(--bord);
+}
+
+.bouton.discret {
+  background: transparent;
+  box-shadow: none;
+}
+
+.bouton.avec-icone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.bouton.avec-icone .icone {
+  color: var(--accent);
+}
+
+.bouton.principal {
+  background: linear-gradient(180deg, #e8bd66, #c38f33);
+  border-color: #e8bd66;
+  color: #22170a;
+  font-family: var(--titre);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 12px rgba(220, 171, 79, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.bouton.principal:disabled {
+  background: var(--surface-haute);
+  border-color: var(--bord);
+  box-shadow: none;
+}
+
+.bouton.rond.degats:not(:disabled) {
+  border-color: rgba(217, 88, 74, 0.6);
+  color: var(--alerte);
+}
+
+.bouton.rond.soins:not(:disabled) {
+  border-color: rgba(111, 194, 140, 0.6);
+  color: var(--dispo);
+}
+
+.pave-actions .bouton.degats:not(:disabled) {
+  color: var(--alerte);
+}
+
+/* Portrait générique */
+.titre-perso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.titre-texte {
+  min-width: 0;
+}
+
+.embleme {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--accent);
+  background: radial-gradient(circle at 35% 30%, #3b2f22, #17120e 70%);
+  border: 2px solid var(--bronze);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5), 0 0 14px rgba(220, 171, 79, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.embleme-espece {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 46%;
+  height: 46%;
+  border-radius: 50%;
+  background: var(--surface-haute);
+  border: 1px solid var(--bronze);
+  color: var(--texte);
+}
+
+.choix-principal.avec-vignette {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.choix-texte {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.choix-texte small {
+  color: var(--discret);
+  font-size: 0.8rem;
+}
+
+.vignette {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--accent);
+  background: radial-gradient(circle at 35% 30%, #3b2f22, #17120e 70%);
+  border: 1px solid var(--bronze);
+}
+
+/* PV */
+.pv {
+  padding: 12px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--bord);
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 40%, rgba(217, 88, 74, 0.1), transparent 70%),
+    linear-gradient(180deg, rgba(255, 236, 200, 0.045), rgba(0, 0, 0, 0.12)),
+    var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.06), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.pv-valeur {
+  gap: 6px;
+}
+
+.pv-ligne {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pv-actuels {
+  font-size: 4.6rem;
+}
+
+.pv-max {
+  font-family: var(--titre);
+  font-size: 1.2rem;
+  align-self: flex-end;
+  margin-bottom: 0.7rem;
+}
+
+.pv-icone {
+  color: var(--alerte);
+}
+
+.pv-icone.critique {
+  animation: battre 1s ease-in-out infinite;
+}
+
+.pv-icone.zero {
+  color: var(--epuise);
+}
+
+.pv-jauge {
+  width: 100%;
+  max-width: 200px;
+  height: 8px;
+  border-radius: 999px;
+  background: #0b0907;
+  border: 1px solid var(--bord);
+  overflow: hidden;
+}
+
+.pv-jauge span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f9a68, var(--dispo));
+  transition: width 0.25s ease;
+}
+
+.pv-jauge span.blesse {
+  background: linear-gradient(90deg, #b07a2a, var(--accent));
+}
+
+.pv-jauge span.critique {
+  background: linear-gradient(90deg, #8d2c22, var(--alerte));
+}
+
+.pv-sous {
+  color: var(--discret);
+  font-size: 0.75rem;
+  min-height: 1.4em;
+}
+
+.pv-temp {
+  margin-top: 0;
+  font-size: 0.75rem;
+}
+
+.pv.compact {
+  padding: 6px;
+}
+
+.pv.compact .pv-actuels {
+  font-size: 3.4rem;
+}
+
+.pv.compact .pv-max {
+  margin-bottom: 0.45rem;
+}
+
+.pv.compact .bouton.rond.grand {
+  width: 56px;
+  height: 56px;
+}
+
+@keyframes battre {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-icone.critique {
+    animation: none;
+  }
+}
+
+/* Combat */
+.tete-combat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tete-combat .phase {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.tete-combat .phase strong {
+  font-family: var(--titre);
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+
+.tuiles .tuile {
+  min-height: 120px;
+}
+
+.case-tete h2,
+.case-ligne h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texte);
+  letter-spacing: 0.06em;
+}
+
+.depliant summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.case.utilisee {
+  opacity: 0.7;
+  filter: saturate(0.6);
+}
+
+.bouton-tour {
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6), 0 2px 12px rgba(220, 171, 79, 0.3);
+}
+
+/* Barre d'onglets */
+.barre {
+  background: linear-gradient(180deg, #1f1915, #14100d);
+  border-top: 1px solid var(--bronze);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.barre button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+}
+
+.barre button .icone {
+  opacity: 0.75;
+}
+
+.barre button.actif .icone {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(220, 171, 79, 0.55));
+}
+
+/* Panneau du bas */
+.feuille {
+  background: linear-gradient(180deg, #2a221b, var(--surface) 120px);
+  border-top: 1px solid var(--bronze);
+}
+
+/* Combat : CA et ressource sur une ligne basse, pour laisser la place aux actions */
+.tuiles.compactes .tuile {
+  min-height: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  padding: 10px 14px;
+}
+
+.tuiles.compactes .etiquette {
+  width: 100%;
+}
+
+.tuiles.compactes .chiffre {
+  font-size: 2.4rem;
+}
+
+.tuiles.compactes .tuile-boutons {
+  margin: 0;
+  gap: 6px;
+}
+
+.tuiles.compactes .filigrane {
+  width: 64px;
+  height: 64px;
+}
+
+/* En-tête de la fiche : boutons icône + libellé court, sans retour à la ligne */
+.actions-tete .bouton.avec-icone {
+  flex-direction: column;
+  gap: 2px;
+  min-width: 52px;
+  padding: 4px 6px;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}

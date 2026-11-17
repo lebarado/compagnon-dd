@@ -13,6 +13,7 @@ import { Encyclopedie } from './ecrans/Encyclopedie'
 import { Creation } from './ecrans/Creation'
 import { Personnages } from './ecrans/Personnages'
 import { ImportPack } from './ecrans/ImportPack'
+import { Icone } from './composants/Icone'
 
 type IdOnglet = 'perso' | 'combat' | 'sorts' | 'sac' | 'carnet' | 'regles'
 type Vue = 'onglets' | 'creation' | 'personnages' | 'pack'
@@ -114,7 +115,8 @@ export function App() {
       <nav className="barre" aria-label="Écrans" style={{ gridTemplateColumns: `repeat(${onglets.length}, 1fr)` }}>
         {onglets.map((o) => (
           <button key={o.id} className={o.id === courant ? 'actif' : ''} aria-current={o.id === courant ? 'page' : undefined} onClick={() => setOnglet(o.id)}>
-            {o.nom}
+            <Icone nom={o.id} taille={24} />
+            <span>{o.nom}</span>
           </button>
         ))}
       </nav>

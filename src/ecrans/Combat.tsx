@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type ReactNode } from 'react'
 import { regles } from '../regles/pack'
-import { calculer, emplacements, formatMod, initiative, ressourcePrincipale, ressourceRestante, ressources, texte } from '../regles/calculs'
+import { calculer, classeArmure, emplacements, formatMod, initiative, ressourcePrincipale, ressourceRestante, ressources, texte } from '../regles/calculs'
 import { abordable, contraintes, couts, deplacement, etatsActifs, libelle, optionsPour, regleOption, sortsLancables, type TempsSort } from '../regles/options'
 import { metres } from '../regles/noms'
 import type { Emplacement, OptionCombat, Sort } from '../regles/types'
@@ -8,6 +8,8 @@ import type { Action, Personnage } from '../etat/personnage'
 import type { Case, Demande, Place } from '../etat/combat'
 import { ChoixDe, Feuille, FeuilleRegle, type Affichable } from '../composants/Feuille'
 import { FeuilleSort } from './Sorts'
+import { PointsDeVie } from '../composants/PointsDeVie'
+import { Icone, type NomIcone } from '../composants/Icone'
 
 interface Props {
   p: Personnage
@@ -33,11 +35,14 @@ function Badge({ o }: { o: { cout?: { ressource: string; nombre: number } } }) {
   )
 }
 
-function Bloc({ titre, note, children, className = '' }: { titre: ReactNode; note?: ReactNode; children?: ReactNode; className?: string }) {
+function Bloc({ titre, icone, note, children, className = '' }: { titre: ReactNode; icone?: NomIcone; note?: ReactNode; children?: ReactNode; className?: string }) {
   return (
     <section className={`case ${className}`}>
       <header className="case-tete">
-        <h2>{titre}</h2>
+        <h2>
+          {icone && <Icone nom={icone} taille={22} className="accent" />}
+          {titre}
+        </h2>
         {note}
       </header>
       {children}
@@ -206,7 +211,7 @@ export function Combat({ p, dispatch }: Props) {
       <div className="ligne-option">
         <button className="option-principale" onClick={() => setFeuille(temps)}>
           <span className="option-texte">
-            <strong>Lancer un sort</strong>
+            <strong className="avec-icone"><Icone nom="sort" taille={18} className="accent" /> Lancer un sort</strong>
             <small>{sortsLancables(p, temps).length} sorts</small>
           </span>
         </button>
@@ -217,22 +222,22 @@ export function Combat({ p, dispatch }: Props) {
     const u = c.cases[place]
     if (k.neutralise)
       return (
-        <Bloc titre={TITRES[place]} key={place} className="indispo">
+        <Bloc titre={TITRES[place]} icone={place} key={place} className="indispo">
           <p className="aide">Impossible : Neutralisé (p. 370)</p>
         </Bloc>
       )
-    if (u) return <Bloc titre={TITRES[place]} key={place} className="utilisee">{faitCase(place)}</Bloc>
+    if (u) return <Bloc titre={TITRES[place]} icone={place} key={place} className="utilisee">{faitCase(place)}</Bloc>
     if (compact)
       return (
         <details className="depliant" key={place}>
           <summary>
-            {TITRES[place]} <span className="dispo">disponible</span>
+            <Icone nom={place} taille={22} className="accent" /> {TITRES[place]} <span className="dispo">disponible</span>
           </summary>
           <div className="depliant-corps">{contenu}</div>
         </details>
       )
     return (
-      <Bloc titre={TITRES[place]} key={place}>
+      <Bloc titre={TITRES[place]} icone={place} key={place}>
         {contenu}
       </Bloc>
     )
@@ -244,7 +249,7 @@ export function Combat({ p, dispatch }: Props) {
     return c.phase === 'tour' || c.cases.reaction?.id === 'attaque-opportunite'
   })
   const blocTouche = toucheVisibles.length > 0 && (
-    <Bloc titre="Sur une touche" key="touche">
+    <Bloc titre="Sur une touche" icone="touche" key="touche">
       {toucheVisibles.map((o) =>
         o.sousChoix && !o.cout ? (
           <div className="ligne-option groupe" key={o.id}>
@@ -272,7 +277,7 @@ export function Combat({ p, dispatch }: Props) {
 
   const autres = [...(c.phase === 'tour' ? [...optionsPour(p, 'debut-de-tour'), ...optionsPour(p, 'fin-de-tour')] : []), ...optionsPour(p, 'declencheur')]
   const blocAutres = autres.length > 0 && (
-    <Bloc titre="Autres" key="autres">
+    <Bloc titre="Autres" icone="autres" key="autres">
       {lignes('libre', autres)}
     </Bloc>
   )
@@ -281,6 +286,7 @@ export function Combat({ p, dispatch }: Props) {
   const blocEtats = (
     <Bloc
       titre="États"
+      icone="etats"
       key="etats"
       note={
         <button className="bouton discret petit" onClick={() => setFeuille('etats')}>
@@ -315,7 +321,7 @@ export function Combat({ p, dispatch }: Props) {
   if (c.phase === 'hors') {
     corps = (
       <>
-        <Bloc titre={<>Initiative <span className="chiffre-moyen">{formatMod(initiative(p))}</span></>}>
+        <Bloc titre={<>Initiative <span className="chiffre-moyen">{formatMod(initiative(p))}</span></>} icone="initiative">
           {optionsPour(p, 'initiative').length ? lignes('libre', optionsPour(p, 'initiative')) : <p className="aide">Lance 1d20 {formatMod(initiative(p))}.</p>}
         </Bloc>
         {blocEtats}
@@ -363,7 +369,10 @@ export function Combat({ p, dispatch }: Props) {
           </>,
         )}
         <section className="case case-ligne">
-          <h2>Déplacement</h2>
+          <h2>
+            <Icone nom="vitesse" taille={22} className="accent" />
+            Déplacement
+          </h2>
           <strong className="chiffre-moyen">{metres(dep)}</strong>
         </section>
         {k.aTerre && <p className="aide">À terre : se relever coûte la moitié de ta Vitesse (p. 360).</p>}
@@ -389,39 +398,42 @@ export function Combat({ p, dispatch }: Props) {
   return (
     <main className="ecran avec-action">
       <header className="tete-combat">
-        {principale ? (
-          <div className="ressource-combat">
+        <div className="phase">
+          <Icone nom={c.phase === 'tour' ? 'combat' : c.phase === 'attente' ? 'tour' : 'initiative'} taille={26} className="accent" />
+          <strong>{titrePhase}</strong>
+        </div>
+        {c.phase !== 'hors' && (
+          <button className="bouton discret petit" onClick={() => dispatch({ type: 'phase', phase: 'hors' })}>
+            Fin du combat
+          </button>
+        )}
+      </header>
+      <PointsDeVie p={p} dispatch={dispatch} compact />
+      <section className="tuiles compactes">
+        <div className="tuile">
+          <Icone nom="ca" taille={64} className="filigrane" />
+          <span className="etiquette">CA</span>
+          <span className="chiffre">{classeArmure(p)}</span>
+        </div>
+        {principale && (
+          <div className="tuile">
+            <Icone nom="ressource" taille={64} className="filigrane" />
             <span className="etiquette">{principale.nom}</span>
             <span className={`chiffre ${ressourceRestante(p, principale.id) === 0 ? 'epuise' : 'dispo'}`}>
               {ressourceRestante(p, principale.id)}
               <small> / {principale.valeurMax}</small>
             </span>
-          </div>
-        ) : (
-          <div className="ressource-combat">
-            <span className="etiquette">PV</span>
-            <span className={`chiffre ${p.pv === 0 ? 'epuise' : ''}`}>{p.pv}</span>
-          </div>
-        )}
-        {principale && (
-          <div className="tuile-boutons">
-            <button className="bouton rond" aria-label={`Dépenser : ${principale.nom}`} disabled={ressourceRestante(p, principale.id) === 0} onClick={() => dispatch({ type: 'ressource', id: principale.id, delta: -1 })}>
-              −
-            </button>
-            <button className="bouton rond" aria-label={`Récupérer : ${principale.nom}`} disabled={ressourceRestante(p, principale.id) >= principale.valeurMax} onClick={() => dispatch({ type: 'ressource', id: principale.id, delta: 1 })}>
-              +
-            </button>
+            <div className="tuile-boutons">
+              <button className="bouton rond" aria-label={`Dépenser : ${principale.nom}`} disabled={ressourceRestante(p, principale.id) === 0} onClick={() => dispatch({ type: 'ressource', id: principale.id, delta: -1 })}>
+                −
+              </button>
+              <button className="bouton rond" aria-label={`Récupérer : ${principale.nom}`} disabled={ressourceRestante(p, principale.id) >= principale.valeurMax} onClick={() => dispatch({ type: 'ressource', id: principale.id, delta: 1 })}>
+                +
+              </button>
+            </div>
           </div>
         )}
-        <div className="phase">
-          <strong>{titrePhase}</strong>
-          {c.phase !== 'hors' && (
-            <button className="bouton discret petit" onClick={() => dispatch({ type: 'phase', phase: 'hors' })}>
-              Fin du combat
-            </button>
-          )}
-        </div>
-      </header>
+      </section>
       {emplacements(p).length > 0 && (
         <div className="emplacements-ligne">
           {emplacements(p).map((e) => (
