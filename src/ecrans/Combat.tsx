@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type ReactNode } from 'react'
 import { regles } from '../regles/pack'
-import { calculer, classeArmure, emplacements, formatMod, initiative, ressourcePrincipale, ressourceRestante, ressources, texte } from '../regles/calculs'
+import { armeDe, attaqueArme, calculer, classeArmure, emplacements, mainsNues, formatMod, initiative, ressourcePrincipale, ressourceRestante, ressources, texte } from '../regles/calculs'
 import { abordable, contraintes, couts, deplacement, etatsActifs, libelle, optionsPour, regleOption, sortsLancables, type TempsSort } from '../regles/options'
 import { metres } from '../regles/noms'
 import type { Emplacement, OptionCombat, Sort } from '../regles/types'
@@ -47,6 +47,34 @@ function Bloc({ titre, icone, note, children, className = '' }: { titre: ReactNo
       </header>
       {children}
     </section>
+  )
+}
+
+/** Armes équipées (Sac) avec bonus d'attaque et dégâts, puis mains nues (p. 362). */
+function Armes({ p }: { p: Personnage }) {
+  const armes = p.inventaire.flatMap((o) => {
+    const a = o.equipe ? armeDe(o.ref) : undefined
+    return a ? [{ uid: o.uid, nom: o.nom, ...attaqueArme(p, a) }] : []
+  })
+  const mn = mainsNues(p)
+  return (
+    <span className="armes">
+      {armes.map((a) => (
+        <span key={a.uid}>
+          {a.nom}
+          <b>
+            {formatMod(a.toucher)} · {a.degats}
+          </b>
+        </span>
+      ))}
+      <span>
+        Mains nues
+        <b>
+          {formatMod(mn.toucher)} · {mn.degats}
+        </b>
+      </span>
+      {armes.length === 0 && <span>Équipe une arme dans le Sac pour la voir ici.</span>}
+    </span>
   )
 }
 
@@ -101,7 +129,8 @@ export function Combat({ p, dispatch }: Props) {
   }
 
   const sous = (o: OptionCombat) => {
-    const parts = [libelle(p, o.de)]
+    // L'attaque liste déjà les armes et les mains nues : seul le nombre d'attaques reste utile.
+    const parts = [o.id === 'attaque' && o.de === '{mainsNues}' ? null : libelle(p, o.de)]
     if (o.cout && !o.cout.ressource.startsWith('sort-') && o.cout.ressource !== 'credo' && o.cout.ressource !== principale?.id) {
       const max = ressources(p).find((r) => r.id === o.cout!.ressource)?.valeurMax
       if (max !== undefined) parts.push(`${ressourceRestante(p, o.cout.ressource)}/${max}`)
@@ -128,6 +157,7 @@ export function Combat({ p, dispatch }: Props) {
                   {estFait && ' ✓'}
                 </strong>
                 {sous(o) && <small>{sous(o)}</small>}
+                {o.id === 'attaque' && <Armes p={p} />}
               </span>
               <Badge o={o} />
             </button>
@@ -400,8 +430,19 @@ export function Combat({ p, dispatch }: Props) {
       <header className="tete-combat">
         <div className="phase">
           <Icone nom={c.phase === 'tour' ? 'combat' : c.phase === 'attente' ? 'tour' : 'initiative'} taille={26} className="accent" />
-          <strong>{titrePhase}</strong>
+          <span className="phase-texte">
+            <strong>{titrePhase}</strong>
+            {c.round > 0 && <span className="round">Round {c.round}</span>}
+          </span>
         </div>
+        <button
+          className="bouton discret inspiration"
+          aria-pressed={p.inspiration}
+          aria-label={p.inspiration ? 'Inspiration héroïque : dépenser' : 'Inspiration héroïque : gagner'}
+          onClick={() => dispatch({ type: 'inspiration' })}
+        >
+          <Icone nom="inspiration" taille={24} />
+        </button>
         {c.phase !== 'hors' && (
           <button className="bouton discret petit" onClick={() => dispatch({ type: 'phase', phase: 'hors' })}>
             Fin du combat

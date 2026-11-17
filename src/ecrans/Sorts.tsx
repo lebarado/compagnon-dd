@@ -32,7 +32,7 @@ export function FeuilleSort({ p, sort, place, dispatch, onFermer }: { p: Personn
     dispatch?.({
       type: 'utiliser',
       place: place ?? 'libre',
-      demande: { id: `sort:${sort.id}`, nom: sort.nom, couts: emplacement ? { [emplacement]: 1 } : {} },
+      demande: { id: `sort:${sort.id}`, nom: sort.nom, couts: emplacement ? { [emplacement]: 1 } : {}, concentration: sort.concentration ? sort.nom : undefined },
     })
     onFermer()
   }

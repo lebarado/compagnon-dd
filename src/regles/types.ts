@@ -327,4 +327,6 @@ export interface Pack {
   etats: Etat[]
   repos: Record<'court' | 'long', Regle & { benefices: string[] }>
   glossaire: EntreeGlossaire[]
+  /** Langues (p. 37) : le Commun, deux courantes au choix ; les rares viennent d'aptitudes. */
+  langues?: { page: number; resume: string; nota?: string; courantes: { id: string; nom: string }[]; rares: { id: string; nom: string }[] }
 }

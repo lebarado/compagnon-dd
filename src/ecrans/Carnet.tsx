@@ -2,6 +2,9 @@ import { useState, type Dispatch } from 'react'
 import { correspond } from '../regles/noms'
 import { nouvelId, type Action, type Note, type Personnage } from '../etat/personnage'
 import { Feuille } from '../composants/Feuille'
+import { Icone } from '../composants/Icone'
+import type { ControleSession } from '../etat/useSession'
+import { Groupe } from './Groupe'
 
 const CATEGORIES: { id: Note['categorie']; nom: string }[] = [
   { id: 'session', nom: 'Sessions' },
@@ -48,11 +51,39 @@ function Editeur({ note, onEnregistrer, onSupprimer, onFermer }: { note: Note; o
   )
 }
 
-export function Carnet({ p, dispatch }: { p: Personnage; dispatch: Dispatch<Action> }) {
+export function Carnet({ p, dispatch, session }: { p: Personnage; dispatch: Dispatch<Action>; session: ControleSession }) {
+  const [vue, setVue] = useState<'notes' | 'groupe'>(session.etat.statut === 'connecte' ? 'groupe' : 'notes')
   const [filtre, setFiltre] = useState<Note['categorie'] | null>(null)
   const [recherche, setRecherche] = useState('')
   const [edition, setEdition] = useState<Note | null>(null)
   const notes = p.notes.filter((n) => (!filtre || n.categorie === filtre) && correspond(`${n.titre} ${n.texte}`, recherche))
+
+  const onglets = (
+    <div className="onglets-carnet" role="tablist">
+      {(
+        [
+          ['notes', 'Notes', 'note'],
+          ['groupe', `Groupe${p.equipe.length ? ` · ${p.equipe.length}` : ''}`, 'perso'],
+        ] as const
+      ).map(([id, nom, icone]) => (
+        <button key={id} role="tab" aria-selected={vue === id} className={`puce ${vue === id ? 'choisi' : ''}`} onClick={() => setVue(id)}>
+          <Icone nom={icone} taille={18} /> {nom}
+          {id === 'groupe' && session.etat.statut === 'connecte' && <span className="point-direct" aria-label="session en cours" />}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (vue === 'groupe')
+    return (
+      <main className="ecran">
+        <header className="tete">
+          <h1>Carnet</h1>
+        </header>
+        {onglets}
+        <Groupe p={p} dispatch={dispatch} session={session} />
+      </main>
+    )
 
   return (
     <main className="ecran">
@@ -65,6 +96,7 @@ export function Carnet({ p, dispatch }: { p: Personnage; dispatch: Dispatch<Acti
           Nouvelle note
         </button>
       </header>
+      {onglets}
       <input className="champ" placeholder="Rechercher dans le carnet" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
       <div className="puces">
         {CATEGORIES.map((c) => (

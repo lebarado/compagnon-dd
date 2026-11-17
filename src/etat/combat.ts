@@ -17,6 +17,8 @@ export interface Demande {
   effets?: string[]
   soins?: number
   pvTemp?: number
+  /** Sort à Concentration lancé : remplace la Concentration en cours (p. 364). */
+  concentration?: string
 }
 
 /** Trace d'une utilisation, assez précise pour l'annuler. */
@@ -28,6 +30,8 @@ export interface Utilisation {
   effets?: string[]
   soins?: number
   pvTempAvant?: number
+  /** Concentration remplacée par cette utilisation, pour l'annuler. */
+  concentrationAvant?: { id: string; nom: string } | null
   sousChoix?: { id: string; nom: string; delta: Record<string, number> }
 }
 
@@ -38,9 +42,11 @@ export interface EtatCombat {
   touches: Utilisation[]
   /** Effets actifs, avec répétitions (deux Pointes = deux entrées). */
   effets: string[]
+  /** Numéro du round, compté à chaque début de mon tour. */
+  round: number
 }
 
-export const combatVierge = (): EtatCombat => ({ phase: 'hors', cases: {}, touches: [], effets: [] })
+export const combatVierge = (): EtatCombat => ({ phase: 'hors', cases: {}, touches: [], effets: [], round: 0 })
 
 function expiration(id: string): Effet['jusqua'] | undefined {
   return regles?.combat.effets[id]?.jusqua
@@ -68,7 +74,7 @@ export function retirerUn(liste: string[], elements: string[]): string[] {
  */
 export function changerPhase(c: EtatCombat, phase: Phase): EtatCombat {
   if (phase === 'hors') return combatVierge()
-  if (phase === 'tour') return { phase, cases: {}, touches: [], effets: retirerEffets(c.effets, 'debut-de-tour') }
+  if (phase === 'tour') return { phase, cases: {}, touches: [], effets: retirerEffets(c.effets, 'debut-de-tour'), round: (c.round ?? 0) + 1 }
   if (c.phase === 'tour') return { ...c, phase, touches: [], effets: retirerEffets(c.effets, 'fin-de-tour') }
-  return { ...combatVierge(), phase }
+  return { ...combatVierge(), phase, round: c.round ?? 0 }
 }

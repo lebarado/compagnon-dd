@@ -474,3 +474,149 @@ h1 {
   font-size: 0.68rem;
   white-space: nowrap;
 }
+
+.bouton.inspiration[aria-pressed='true'] .icone {
+  color: var(--accent);
+  filter: drop-shadow(0 0 6px rgba(220, 171, 79, 0.7));
+}
+
+.bouton.inspiration[aria-pressed='false'] .icone {
+  color: var(--epuise);
+}
+
+/* Concentration en cours, et rappel du JS après des dégâts */
+.concentration {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 6px 8px 6px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--bronze);
+  background: linear-gradient(90deg, rgba(220, 171, 79, 0.12), transparent), var(--surface);
+}
+
+.concentration.jet {
+  border-color: var(--alerte);
+}
+
+.concentration-texte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 0.9rem;
+}
+
+.concentration-texte small {
+  display: block;
+  color: var(--alerte);
+  font-weight: 700;
+}
+
+.concentration-boutons {
+  display: flex;
+  gap: 6px;
+}
+
+/* Attaque : armes équipées sous le bouton */
+.armes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.armes span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--discret);
+}
+
+.armes b {
+  color: var(--texte);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.phase-texte {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.tete-combat .phase {
+  flex: 1;
+  min-width: 0;
+}
+
+.tete-combat .phase strong {
+  white-space: nowrap;
+}
+
+.round {
+  font-family: var(--titre);
+  font-size: 0.8rem;
+  color: var(--discret);
+}
+
+/* Groupe : coéquipiers et session */
+.coequipier {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sante {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+
+.sante.indemne { color: var(--dispo); }
+.sante.blesse { color: var(--accent); }
+.sante.grave { color: var(--alerte); }
+.sante.zero { color: var(--alerte); background: rgba(217, 88, 74, 0.15); }
+
+.onglets-carnet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.onglets-carnet .puce {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.point-direct {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dispo);
+  box-shadow: 0 0 6px var(--dispo);
+}
+
+.code-session {
+  font-family: var(--titre);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-align: center;
+  color: var(--accent);
+}
+
+.zone-notes {
+  min-height: 140px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.4;
+}

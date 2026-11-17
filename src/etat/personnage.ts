@@ -57,6 +57,36 @@ export interface Personnage {
   jsMort: { reussites: number; echecs: number }
   combat: EtatCombat
   notes: Note[]
+  /** Langues choisies à la création, en plus du Commun (p. 37). */
+  langues: string[]
+  /** Effet à Concentration en cours (p. 364). */
+  concentration: { id: string; nom: string } | null
+  /** Coéquipiers connus : saisis à la main ou reçus d'une session. */
+  equipe: Coequipier[]
+}
+
+/** Ce qu'un joueur montre aux autres : ce qui se voit à la table, rien de sa fiche. */
+export interface CartePublique {
+  id: string
+  nom: string
+  espece: string
+  classe: string
+  niveau: number
+  /** Ce qui se voit : indemne, blessé, gravement blessé (moitié des PV ou moins), 0 PV. Jamais le chiffre. */
+  sante: 'indemne' | 'blesse' | 'grave' | 'zero'
+  etats: string[]
+  concentration: string | null
+}
+
+export interface Coequipier {
+  id: string
+  nom: string
+  /** Texte libre (« Elfe Rôdeuse »…) pour un coéquipier saisi à la main. */
+  description: string
+  notes: string
+  /** Dernière carte reçue en session, si ce coéquipier utilise l'app. */
+  carte?: CartePublique
+  vu?: string
 }
 
 export const NIVEAU_MAX = 20
@@ -91,6 +121,9 @@ export function personnageVierge(): Personnage {
     jsMort: { reussites: 0, echecs: 0 },
     combat: combatVierge(),
     notes: [],
+    langues: [],
+    concentration: null,
+    equipe: [],
   }
 }
 
@@ -119,8 +152,26 @@ export type Action =
   | { type: 'pieces'; pieces: Pieces }
   | { type: 'note'; note: Note }
   | { type: 'retirerNote'; id: string }
+  | { type: 'langues'; langues: string[] }
+  | { type: 'concentration'; valeur: { id: string; nom: string } | null }
+  | { type: 'coequipier'; coequipier: Coequipier }
+  | { type: 'retirerCoequipier'; id: string }
+  | { type: 'cartes'; cartes: CartePublique[] }
 
 const borner = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
+
+/** Neutralisé, directement ou par un état qui l'inclut (Étourdi, Inconscient…). */
+function neutralise(p: Personnage): boolean {
+  const vus = new Set<string>()
+  const pile = [...p.etats]
+  while (pile.length) {
+    const id = pile.pop()!
+    if (vus.has(id)) continue
+    vus.add(id)
+    pile.push(...(regles.etats.find((e) => e.id === id)?.inclut ?? []))
+  }
+  return vus.has('neutralise')
+}
 
 /** Les pv temporaires absorbent les dégâts avant les pv réels (p. 29). À 0 pv, des dégâts valent un échec (p. 29). */
 export function appliquerDegats(p: Personnage, montant: number): Personnage {
@@ -175,6 +226,10 @@ function utiliser(p: Personnage, place: Place, d: Demande): Personnage {
   if (!res) return p
   let q: Personnage = { ...p, depenses: res.depenses }
   const u: Utilisation = { id: d.id, nom: d.nom, delta: res.delta, effets: d.effets }
+  if (d.concentration) {
+    u.concentrationAvant = q.concentration
+    q = { ...q, concentration: { id: d.id, nom: d.concentration } }
+  }
   if (d.soins) {
     const avant = q.pv
     q = appliquerSoins(q, d.soins)
@@ -202,7 +257,8 @@ function annuler(p: Personnage, place: Case | 'touche', id?: string): Personnage
     delete cases[place]
     combat.cases = cases
   }
-  return recadrer({ ...p, depenses, combat, pv: Math.max(0, p.pv - (u.soins ?? 0)), pvTemp: u.pvTempAvant ?? p.pvTemp })
+  const concentration = u.concentrationAvant !== undefined ? u.concentrationAvant : p.concentration
+  return recadrer({ ...p, depenses, combat, concentration, pv: Math.max(0, p.pv - (u.soins ?? 0)), pvTemp: u.pvTempAvant ?? p.pvTemp })
 }
 
 /** Recharge les ressources selon le type de repos (p. 373). */
@@ -232,8 +288,11 @@ export function reducteur(p: Personnage | null, a: Action): Personnage | null {
       const ecart = pvMax(a.personnage) - pvMax(p)
       return recadrer({ ...a.personnage, pv: p.pv + ecart })
     }
-    case 'degats':
-      return appliquerDegats(p, a.montant)
+    case 'degats': {
+      // À 0 PV on est Inconscient, donc Neutralisé : la Concentration prend fin (p. 364).
+      const q = appliquerDegats(p, a.montant)
+      return q.pv === 0 ? { ...q, concentration: null } : q
+    }
     case 'soins':
       return appliquerSoins(p, a.montant)
     case 'pvTemp':
@@ -257,8 +316,11 @@ export function reducteur(p: Personnage | null, a: Action): Personnage | null {
     }
     case 'phase':
       return { ...p, combat: changerPhase(p.combat, a.phase) }
-    case 'etat':
-      return { ...p, etats: p.etats.includes(a.id) ? p.etats.filter((e) => e !== a.id) : [...p.etats, a.id] }
+    case 'etat': {
+      const q = { ...p, etats: p.etats.includes(a.id) ? p.etats.filter((e) => e !== a.id) : [...p.etats, a.id] }
+      // Neutralisé (ou un état qui l'inclut) met fin à la Concentration (p. 364).
+      return neutralise(q) ? { ...q, concentration: null } : q
+    }
     case 'epuisement':
       return { ...p, epuisement: borner(p.epuisement + a.delta, 0, 6) }
     case 'jsMort': {
@@ -281,7 +343,7 @@ export function reducteur(p: Personnage | null, a: Action): Personnage | null {
     case 'reposLong': {
       // Tous les pv et tous les dés de vie, −1 Épuisement, pv temporaires perdus (p. 373, 29).
       const q = { ...p, depenses: recharger(p, 'repos-long'), desDeVieDepenses: 0, pvTemp: 0, epuisement: Math.max(0, p.epuisement - 1) }
-      return { ...q, pv: pvMax(q), jsMort: { reussites: 0, echecs: 0 }, combat: combatVierge() }
+      return { ...q, pv: pvMax(q), jsMort: { reussites: 0, echecs: 0 }, combat: combatVierge(), concentration: null }
     }
     case 'niveau': {
       if (p.niveau >= NIVEAU_MAX) return p
@@ -316,5 +378,32 @@ export function reducteur(p: Personnage | null, a: Action): Personnage | null {
     }
     case 'retirerNote':
       return { ...p, notes: p.notes.filter((n) => n.id !== a.id) }
+    case 'langues':
+      return { ...p, langues: a.langues }
+    case 'concentration':
+      return { ...p, concentration: a.valeur }
+    case 'coequipier': {
+      const existe = p.equipe.some((c) => c.id === a.coequipier.id)
+      // La carte reçue en session reste la plus récente, même si la fiche a été ouverte avant son arrivée.
+      return {
+        ...p,
+        equipe: existe ? p.equipe.map((c) => (c.id === a.coequipier.id ? { ...a.coequipier, carte: c.carte, vu: c.vu } : c)) : [...p.equipe, a.coequipier],
+      }
+    }
+    case 'retirerCoequipier':
+      return { ...p, equipe: p.equipe.filter((c) => c.id !== a.id) }
+    case 'cartes': {
+      // Cartes reçues en session : met à jour le coéquipier du même identifiant, ou l'ajoute.
+      const vu = new Date().toISOString()
+      let equipe = p.equipe
+      for (const carte of a.cartes) {
+        if (carte.id === p.id) continue
+        const c = equipe.find((x) => x.id === carte.id)
+        equipe = c
+          ? equipe.map((x) => (x.id === carte.id ? { ...x, nom: carte.nom, carte, vu } : x))
+          : [...equipe, { id: carte.id, nom: carte.nom, description: '', notes: '', carte, vu }]
+      }
+      return { ...p, equipe }
+    }
   }
 }

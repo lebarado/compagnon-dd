@@ -9,6 +9,13 @@ import { Icone } from './Icone'
 export function PointsDeVie({ p, dispatch, compact = false }: { p: Personnage; dispatch: Dispatch<Action>; compact?: boolean }) {
   const [pave, setPave] = useState(false)
   const [regle, setRegle] = useState(false)
+  /** DD du JS de Constitution à faire après des dégâts subis en Concentration. */
+  const [ddConc, setDdConc] = useState<number | null>(null)
+  const degats = (n: number) => {
+    // JS Con DD 10 ou moitié des dégâts, 30 au plus (p. 364).
+    if (p.concentration && n > 0 && p.pv > 0) setDdConc(Math.min(30, Math.max(10, Math.floor(n / 2))))
+    dispatch({ type: 'degats', montant: n })
+  }
   const max = pvMax(p)
   const part = max > 0 ? Math.min(100, (100 * p.pv) / max) : 0
   const niveau = p.pv === 0 ? 'zero' : part <= 25 ? 'critique' : part <= 50 ? 'blesse' : 'ok'
@@ -16,7 +23,7 @@ export function PointsDeVie({ p, dispatch, compact = false }: { p: Personnage; d
   return (
     <>
       <section className={`pv ${compact ? 'compact' : ''}`} aria-label="Points de vie">
-        <button className="bouton rond grand degats" aria-label="Perdre 1 point de vie" disabled={p.pv === 0 && p.pvTemp === 0} onClick={() => dispatch({ type: 'degats', montant: 1 })}>
+        <button className="bouton rond grand degats" aria-label="Perdre 1 point de vie" disabled={p.pv === 0 && p.pvTemp === 0} onClick={() => degats(1)}>
           −
         </button>
         <button className="pv-valeur" aria-label={`${p.pv} points de vie sur ${max}. Saisir des dégâts ou des soins`} onClick={() => setPave(true)}>
@@ -34,6 +41,32 @@ export function PointsDeVie({ p, dispatch, compact = false }: { p: Personnage; d
           +
         </button>
       </section>
+
+      {p.concentration && (
+        <section className={`concentration ${ddConc ? 'jet' : ''}`} aria-live="polite">
+          <span className="concentration-texte">
+            <Icone nom="sort" taille={20} className="accent" />
+            <span>
+              <strong>Concentration</strong> · {p.concentration.nom}
+              {ddConc && <small>JS Constitution DD {ddConc}</small>}
+            </span>
+          </span>
+          {ddConc ? (
+            <span className="concentration-boutons">
+              <button className="bouton petit dispo" onClick={() => setDdConc(null)}>
+                Réussi
+              </button>
+              <button className="bouton petit alerte-bord" onClick={() => (setDdConc(null), dispatch({ type: 'concentration', valeur: null }))}>
+                Raté
+              </button>
+            </span>
+          ) : (
+            <button className="bouton discret petit" aria-label={`Arrêter la Concentration : ${p.concentration.nom}`} onClick={() => dispatch({ type: 'concentration', valeur: null })}>
+              Arrêter
+            </button>
+          )}
+        </section>
+      )}
 
       {p.pv === 0 && (
         <section className="mort">
@@ -67,7 +100,7 @@ export function PointsDeVie({ p, dispatch, compact = false }: { p: Personnage; d
           titre="Points de vie"
           onFermer={() => setPave(false)}
           actions={[
-            { nom: 'Dégâts', classe: 'alerte-bord degats', onValider: (n) => dispatch({ type: 'degats', montant: n }) },
+            { nom: 'Dégâts', classe: 'alerte-bord degats', onValider: degats },
             { nom: 'Soins', classe: 'dispo', onValider: (n) => dispatch({ type: 'soins', montant: n }) },
             { nom: 'PV temp.', zeroAutorise: true, onValider: (n) => dispatch({ type: 'pvTemp', montant: n }) },
           ]}

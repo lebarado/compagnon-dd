@@ -53,7 +53,13 @@ Le PDF (`reference/manuel-des-joueurs-2024.pdf`, scan) ne doit jamais être lu e
 - En combat : seulement ce qui est faisable maintenant. Un titre, le coût, le dé. L'explication est à un appui et se referme facilement.
 - Boutons d'au moins 48 px, usage à une main, thème sombre par défaut.
 - Une couleur d'accent (or), une pour « disponible », une pour « épuisé ». Thème « taverne » (`src/styles-theme.css`, police Cinzel pour titres et chiffres) ; icônes game-icons.net (CC BY 3.0) extraites par `node tools/icones.mjs` dans `src/composants/icones-data.ts`, emblème de classe comme portrait.
-- PV : composant partagé `src/composants/PointsDeVie.tsx` (Perso et Combat).
+- PV : composant partagé `src/composants/PointsDeVie.tsx` (Perso et Combat), avec la Concentration en cours et le rappel du JS Con après des dégâts.
+
+## Groupe et session
+
+- Carnet → Groupe : coéquipiers (saisis à la main ou reçus en session) et mes notes sur eux (jamais envoyées).
+- Session en direct : `src/etat/session.ts` (PeerJS, relais public pour la mise en relation, puis WebRTC direct ; l'hôte relaie les cartes), `useSession.ts` (reprise auto après veille). Code de 4 caractères.
+- Seule la `CartePublique` circule : nom, espèce, classe, niveau, santé approximative (indemne / blessé / gravement blessé / 0 PV), états, Concentration. Jamais PV, CA ni fiche.
 - PV, CA et la ressource principale sont les plus gros chiffres de l'écran.
 - PV, ressources, objets : un ou deux appuis, sans formulaire.
 - En cas d'hésitation entre une fonctionnalité et un écran léger : écran léger, fonctionnalité proposée en option.

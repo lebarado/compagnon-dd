@@ -14,6 +14,7 @@ import { Creation } from './ecrans/Creation'
 import { Personnages } from './ecrans/Personnages'
 import { ImportPack } from './ecrans/ImportPack'
 import { Icone } from './composants/Icone'
+import { useSession } from './etat/useSession'
 
 type IdOnglet = 'perso' | 'combat' | 'sorts' | 'sac' | 'carnet' | 'regles'
 type Vue = 'onglets' | 'creation' | 'personnages' | 'pack'
@@ -52,6 +53,8 @@ export function App() {
     (a: Action) => setPersonnages((liste) => liste.map((x) => (x.id === actif ? (reducteur(x, a) ?? x) : x))),
     [actif],
   )
+  // La carte publique se calcule avec les règles : seulement une fois le pack chargé.
+  const session = useSession(pack && p && compatible(p, pack) ? p : null, dispatch)
   const installer = (nouveau: Pack) => {
     definirRegles(nouveau)
     setPack(nouveau)
@@ -110,7 +113,7 @@ export function App() {
       {courant === 'combat' && <Combat p={p} dispatch={dispatch} />}
       {courant === 'sorts' && <Sorts p={p} dispatch={dispatch} />}
       {courant === 'sac' && <Sac p={p} dispatch={dispatch} />}
-      {courant === 'carnet' && <Carnet p={p} dispatch={dispatch} />}
+      {courant === 'carnet' && <Carnet p={p} dispatch={dispatch} session={session} />}
       {courant === 'regles' && <Encyclopedie p={p} />}
       <nav className="barre" aria-label="Écrans" style={{ gridTemplateColumns: `repeat(${onglets.length}, 1fr)` }}>
         {onglets.map((o) => (

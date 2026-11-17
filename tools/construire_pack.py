@@ -50,6 +50,9 @@ def assembler() -> dict:
     f = MANUEL / "equipement.json"
     pack["equipement"] = lire(f) if f.exists() else {"armes": [], "armures": [], "objets": []}
     pack["sorts"] = fusionner_dossier(MANUEL / "sorts")
+    f = MANUEL / "langues.json"
+    if f.exists():
+        pack["langues"] = lire(f)
     for f in sorted((MANUEL / "glossaire").glob("*.json")) if (MANUEL / "glossaire").exists() else []:
         pack["glossaire"].extend(lire(f))
     return pack

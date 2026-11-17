@@ -5,6 +5,7 @@ import { correspond, nomCarac, nomCompetence } from '../regles/noms'
 import type { Choix, Regle } from '../regles/types'
 import type { Personnage } from '../etat/personnage'
 import { Feuille, FeuilleRegle, type Affichable } from '../composants/Feuille'
+import { ChoixLangues } from '../composants/Langues'
 
 interface Props {
   p: Personnage
@@ -125,6 +126,13 @@ export function EditeurChoix({ p, choix, valeurs, onChange }: Props) {
       )
       break
     }
+    case 'langue':
+      if (regles.langues) {
+        corps = <ChoixLangues valeurs={valeurs} max={choix.nombre} rares onChange={onChange} />
+        break
+      }
+      corps = <TexteLibre valeurs={valeurs} nombre={choix.nombre} onChange={onChange} />
+      break
     default:
       corps = <TexteLibre valeurs={valeurs} nombre={choix.nombre} onChange={onChange} />
   }

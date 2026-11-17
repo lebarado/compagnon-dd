@@ -33,6 +33,7 @@ import { NIVEAU_MAX } from '../etat/personnage'
 import { ChoixDe, Feuille, FeuilleRegle, LigneRegle, type Affichable } from '../composants/Feuille'
 import { EditeurChoix, FeuilleChoix } from './EditeurChoix'
 import { PointsDeVie } from '../composants/PointsDeVie'
+import { ChoixLangues, languesConnues } from '../composants/Langues'
 import { Embleme, Icone } from '../composants/Icone'
 
 interface Props {
@@ -265,6 +266,12 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
           </span>
         </button>
         <div className="actions-tete">
+          {principale && (
+            <button className="bouton discret avec-icone inspiration" aria-pressed={p.inspiration} onClick={() => dispatch({ type: 'inspiration' })}>
+              <Icone nom="inspiration" taille={20} />
+              Inspi.
+            </button>
+          )}
           <button className="bouton discret avec-icone" onClick={() => setFeuille('repos')}>
             <Icone nom="repos" taille={20} />
             Repos
@@ -413,7 +420,7 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
       </details>
 
       <details className="depliant">
-        <summary>Défenses et sens</summary>
+        <summary>Défenses, sens et langues</summary>
         <ul className="liste">
           <li>
             <span>Résistances</span>
@@ -423,7 +430,17 @@ export function Perso({ p, dispatch, onPersonnages }: Props) {
             <span>Vision dans le noir</span>
             <strong>{visionNoir(p) ? metres(visionNoir(p)) : '—'}</strong>
           </li>
+          <li>
+            <span>Langues</span>
+            <strong>{languesConnues(p).join(', ')}</strong>
+          </li>
         </ul>
+        {regles.langues && (
+          <fieldset className="bloc">
+            <legend>Langues de création : Commun + 2 ({p.langues.length}/2) · p. {regles.langues.page}</legend>
+            <ChoixLangues valeurs={p.langues} max={2} rares={false} onChange={(langues) => dispatch({ type: 'langues', langues })} />
+          </fieldset>
+        )}
       </details>
 
       <button className="bouton discret large" onClick={() => setFeuille('fiche')}>

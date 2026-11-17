@@ -7,6 +7,7 @@ import type { IdCarac, Regle } from '../regles/types'
 import { personnageVierge, type Personnage } from '../etat/personnage'
 import { FeuilleRegle, type Affichable } from '../composants/Feuille'
 import { aIcone, Icone } from '../composants/Icone'
+import { ChoixLangues } from '../composants/Langues'
 import { EditeurChoix } from './EditeurChoix'
 
 /** Création en étapes, dans l'ordre du chapitre 2 : classe, origine, caractéristiques, détails. */
@@ -74,7 +75,7 @@ export function Creation({ onCreer, onAnnuler }: Props) {
   const etapeValide = [
     !!classe,
     !!historique && bonusOk,
-    !!espece,
+    !!espece && (!regles.langues || p.langues.length === 2),
     methode === 'standard' ? CARACS.every((c) => standard[c] !== undefined) : methode === 'points' ? pointsDepenses <= 27 : true,
     !!classe && p.competencesClasse.length === classe.maitrises.competences.nombre,
     attente.length === 0,
@@ -181,6 +182,16 @@ export function Creation({ onCreer, onAnnuler }: Props) {
           }))}
         />
       )
+      if (espece && regles.langues)
+        corps = (
+          <>
+            {corps}
+            <fieldset className="bloc">
+              <legend>Langues : Commun + 2 ({p.langues.length}/2) · p. {regles.langues.page}</legend>
+              <ChoixLangues valeurs={p.langues} max={2} rares={false} onChange={(langues) => setP({ ...p, langues })} />
+            </fieldset>
+          </>
+        )
       break
     case 'Caractéristiques':
       corps = (
